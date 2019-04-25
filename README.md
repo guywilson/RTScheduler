@@ -18,6 +18,8 @@ The scheduler API is quite simple, the sequence of events on start-up of your ap
 4. Schedule any tasks you want to run off the bat using the scheduleTask() function
 5. The very last call you should make is to the schedule() function, the actual scheduling loop (it never returns)
 
+## The API
+
 ### void initScheduler();
 
 Initialises the scheduler task structure. This must be called before any other scheduler API functions.
