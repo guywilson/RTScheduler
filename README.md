@@ -86,7 +86,7 @@ The main scheduler loop, this will loop forever waiting for tasks to be schedule
 
 ## Example
 
-I have included an example that runs on an Atmega microcontroller (as found on Arduino boards), I have tested on an Arduino Nano and Arduino Uno, both have the Atmega328p microcontroller (16Mhz, 1.5K RAM, 32K Flash ROM). The example registers one task that blinks the on-board LED every second on the Arduino (on for 50ms, off for 950ms).
+I have included an example that runs on an Atmega microcontroller (as found on Arduino boards), I have tested on an Arduino Nano and Arduino Uno, both have the Atmega328p microcontroller (16Mhz, 2K RAM, 32K Flash ROM). The example registers one task that blinks the on-board LED every second on the Arduino (on for 50ms, off for 950ms).
 
 ### Building the example
 
