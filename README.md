@@ -44,7 +44,8 @@ De-registers a previously registered task with the scheduler, freeing up the tas
 
 Parameters:     
 
-                uint16_t    taskID          The user-defined unique identifier for the task, as supplied to registerTask()
+                uint16_t    taskID          The user-defined unique identifier for the task, 
+                                            as supplied to registerTask()
 
 ### void scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p)
 
@@ -52,9 +53,12 @@ Schedules the task to run in the specified **time** in the future. A task must b
 
 Parameters:     
 
-                uint16_t    taskID          The user-defined unique identifier for the task, as supplied to registerTask()
-                timer_t     time            Delay before the task runs, this will be in ms if the real-time clock resolution                                               is ms.
-                PTASKPARM   p               A pointer to the task parameter to pass to the task, can be NULL.
+                uint16_t    taskID          The user-defined unique identifier for the task, 
+                                            as supplied to registerTask()
+                timer_t     time            Delay before the task runs, this will be in ms, 
+                                            if the real-time clock resolution is ms.
+                PTASKPARM   p               A pointer to the task parameter to pass to the 
+                                            task, can be NULL.
 
 ### void rescheduleTask(uint16_t taskID, PTASKPARM p)
 
@@ -62,8 +66,10 @@ Re-schedules the task to run again after the same delay as specified in the sche
 
 Parameters:     
 
-                uint16_t    taskID          The user-defined unique identifier for the task, as supplied to registerTask()
-                PTASKPARM   p               A pointer to the task parameter to pass to the task, can be NULL.
+                uint16_t    taskID          The user-defined unique identifier for the task, 
+                                            as supplied to registerTask()
+                PTASKPARM   p               A pointer to the task parameter to pass to the 
+                                            task, can be NULL.
 
 ### void unscheduleTask(uint16_t taskID);
 
@@ -71,7 +77,8 @@ Un-schedules a task that has previously been scheduled, e.g. this will cancel th
 
 Parameters:     
 
-                uint16_t    taskID          The user-defined unique identifier for the task, as supplied to registerTask()
+                uint16_t    taskID          The user-defined unique identifier for the task, 
+                                            as supplied to registerTask()
 
 ### void schedule()
 
