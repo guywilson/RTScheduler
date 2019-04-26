@@ -2,21 +2,23 @@
 
 ## A simple real-time scheduler for embedded applications
 
+What do I mean by real-time scheduler in this instance? When you schedule a task to run in 5ms, you know that it will run in exactly 5ms. This scheduler does not offer pre-emptive multi-tasking as you would expect from Unix or Windows, only one task will run at a time (therefore each task must complete as quickly as possible).
+
 The scheduler relies on a real-time clock clounter for operation, typically this is provided by a timer interrupt (a common feature on microprocessors and microcontrollers). A timer interrupt that increments the clock counter every 1ms (1000 timer per second) is a good starting point.
 
-The scheduler is written in C, and has a small footprint in terms of memory usage and code space. Each task function must be of the form:
+The scheduler is written in C, seems to be reliable long-term, and has a small footprint in terms of memory usage and code space. Each task function must be of the form:
 
-### void task_name(PTASKPARM p);
+  void task_name(PTASKPARM p);
 
 Each task function should do what it needs to do as quickly as possible, it should never wait for something to happen (use interrupts to signal events).
 
 The scheduler API is quite simple, the sequence of events on start-up of your application should be:
 
-1. Setup the real-time clock interrupt
-2. Call initScheduler() to initialise the task structure
+1. Set up the real-time clock interrupt
+2. Call initScheduler() to initialise the task structures
 3. Register your tasks using the registerTask() function
 4. Schedule any tasks you want to run off the bat using the scheduleTask() function
-5. The very last call you should make is to the schedule() function, the actual scheduling loop (it never returns)
+5. The very last call you should make is to the schedule() function, the actual scheduling loop (it **never** returns)
 
 ## The API
 
