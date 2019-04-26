@@ -8,7 +8,7 @@ The scheduler relies on a real-time clock clounter for operation, typically this
 
 The scheduler is written in C, seems to be reliable long-term, and has a small footprint in terms of memory usage and code space. Each task function must be of the form:
 
-  ######void task_name(PTASKPARM p);
+    void task_name(PTASKPARM p);
 
 The PTASKPARM type is defined as a void * so you must cast to/from the actual type of your parameter (e.g. a ptr to a structure).
 
