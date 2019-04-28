@@ -3,8 +3,7 @@
 ** File: scheduler.c
 **
 ** Description: API functions for the real-time scheduler. Inspired by a
-** distant memory of the scheduler I used at Isotek Elecronics Ltd. Leeds,
-** UK circa 1996
+** distant memory of a scheduler I used circa 1996
 **
 ** Copyright: Guy Wilson (c) 2018
 **
