@@ -3,7 +3,7 @@
 #ifndef _INCL_SCHEDULER
 #define _INCL_SCHEDULER
 
-#define MAX_TASKS           	16
+#define MAX_TASKS           	32
 
 typedef void *					PTASKPARM;
 
@@ -23,32 +23,51 @@ typedef uint64_t				timer_t;
 
 #define MAX_TIMER_VALUE			~((timer_t)0)
 
+/*
+** Passed as the time parameter to scheduleTask.
+*/
+#define RUN_NOW                 0
 
 /******************************************************************************
 **
-** Used for tracking CPU usage (e.g. how much time is spent running tasks). If
-** TRACK_CPU_PCT is defined, then the example below will toggle the on-board
-** LED on an Arduino.
+** Task priorities
 **
 ******************************************************************************/
-#ifndef TRACK_CPU_PCT
-#define signalCPUTrackingStart()		// Do nothing
-#define signalCPUTrackingEnd()			// Do nothing
-#else
-#include <avr/io.h>
-#define signalCPUTrackingStart()		PORTB |= _BV(PORTB5)
-#define signalCPUTrackingEnd()			PORTB &= ~(_BV(PORTB5))
-#endif
-
+#define TASK_PRIORITY_HIGHEST   0
+#define TASK_PRIORITY_HIGH      1
+#define TASK_PRIORITY_MED_HIGH  2
+#define TASK_PRIORITY_NORMAL    3
+#define TASK_PRIORITY_LOW       4
+#define TASK_PRIORITY_LOWEST    5
 
 /******************************************************************************
 **
-** The real-time clock that drives the scheduler. Typically this
-** will be incremented by a timer interrupt
+** Task types
 **
 ******************************************************************************/
-extern volatile uint32_t 		_realTimeClock;
+#define TASK_TYPE_PERIODIC      0x01
+#define TASK_TYPE_ON_DEMAND     0x02
 
+/*
+ * If, for example, you want a faster interrupt frequency for the
+ * RTC tick task, set the prescaler here. If you want the interrupt
+ * frequency and clock frequency to be the same, simply set this to 1...
+ */
+#define RTC_INTERRUPT_PRESCALER			4
+
+/******************************************************************************
+**
+** The real-time clock interrupt service routing
+**
+******************************************************************************/
+void        _rtcISR();
+
+/******************************************************************************
+**
+** Get the last recorded busy/idle CPU counts
+**
+******************************************************************************/
+void getCPURatio(uint32_t * idleCount, uint32_t * busyCount);
 
 /******************************************************************************
 **
@@ -57,10 +76,13 @@ extern volatile uint32_t 		_realTimeClock;
 ******************************************************************************/
 void		initScheduler();
 
+void        registerTickTask(void (* tickTask)());
+
 void		registerTask(uint16_t taskID, void (* run)(PTASKPARM));
 void		deregisterTask(uint16_t taskID);
 
-void		scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p);
+void        scheduleTask(uint16_t taskID, timer_t time, uint8_t priority, PTASKPARM p);
+void        scheduleTaskPeriodic(uint16_t taskID, timer_t time, uint8_t priority, PTASKPARM p);
 void		rescheduleTask(uint16_t taskID, PTASKPARM p);
 void		unscheduleTask(uint16_t taskID);
 

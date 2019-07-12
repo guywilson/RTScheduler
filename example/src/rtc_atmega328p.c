@@ -1,17 +1,8 @@
 #include <stdint.h>
 #include <avr/interrupt.h>
+#include <scheduler.h>
 
 #include "rtc_atmega328p.h"
-
-volatile uint32_t 			_realTimeClock;
-static volatile uint16_t	_tickCount = 0;
-
-static void (* _tickTask)();
-
-void nullTick()
-{
-	// Do nothing...
-}
 
 void setupRTC()
 {
@@ -35,49 +26,9 @@ void setupRTC()
     
     // enable timer compare interrupt
     TIMSK1 |= (1 << OCIE1A);
-
-    // Register the nullTick() function...
-    registerTickTask(&nullTick);
-
-    _realTimeClock = 0L;
-
-    initialiseCPUTracking();
-}
-
-uint32_t getCurrentTime()
-{
-	return _realTimeClock;
-}
-
-void registerTickTask(void (* tickTask)())
-{
-	_tickTask = tickTask;
 }
 
 ISR(TIMER1_COMPA_vect, ISR_BLOCK)
 {
-	_tickCount++;
-
-	if (_tickCount == RTC_INTERRUPT_PRESCALER) {
-	    /*
-	    ** The RTC is incremented every 1 ms,
-		** it is used to drive the real time clock
-		** for the scheduler...
-	    */
-		_realTimeClock++;
-
-		_tickCount = 0;
-	}
-
-	signalCPUTrackingStart();
-
-	/*
-	 * Run the tick task, defaults to the nullTick() function.
-	 *
-	 * This must be a very fast operation, as it is outside of
-	 * the scheduler's control. Also, there can be only 1 tick task...
-	 */
-	_tickTask();
-
-	signalCPUTrackingEnd();
+	_rtcISR();
 }

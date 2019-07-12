@@ -1,38 +1,13 @@
+#include <scheduler.h>
+
 #ifndef _INCL_RTC_ATMEGA328P
 #define _INCL_RTC_ATMEGA328P
-
-//#define TRACK_CPU_PCT
-
-/******************************************************************************
-**
-** Used for tracking CPU usage (e.g. how much time is spent running tasks). If
-** TRACK_CPU_PCT is defined, then the example below will toggle the on-board
-** LED on an Arduino.
-**
-******************************************************************************/
-#ifndef TRACK_CPU_PCT
-#define signalCPUTrackingStart()		// Do nothing
-#define signalCPUTrackingEnd()			// Do nothing
-#define initialiseCPUTracking()			// Do nothing
-#else
-#include <avr/io.h>
-#define signalCPUTrackingStart()		PORTB |= _BV(PORTB5)
-#define signalCPUTrackingEnd()			PORTB &= ~(_BV(PORTB5))
-#define initialiseCPUTracking()			DDRB |= _BV(DDB5)			// Set pin B5 as an output
-#endif
 
 /*
  * Set the RTC clock frequency to 1KHz (1ms tick). This is a
  * good frequency for the real-time scheduler...
  */
 #define RTC_CLOCK_FREQ					1000
-
-/*
- * If, for example, you want a faster interrupt frequency for the
- * RTC tick task, set the prescaler here. If you want the interrupt
- * frequency and clock frequency to be the same, simply set this to 1...
- */
-#define RTC_INTERRUPT_PRESCALER			1
 
 /*
  ******************************************************************************
@@ -60,7 +35,5 @@
 
 
 void		setupRTC();
-uint32_t	getCurrentTime();
-void 		registerTickTask(void (* tickTask)());
 
 #endif

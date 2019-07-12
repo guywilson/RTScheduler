@@ -2,8 +2,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "sched/scheduler.h"
-#include "sched/schederr.h"
+#include <scheduler.h>
+#include <schederr.h>
+
 #include "taskdef.h"
 
 #include "rtc_atmega328p.h"
@@ -40,6 +41,7 @@ void main(void)
 	scheduleTask(
 			TASK_HEARTBEAT,
 			rtc_val_ms(950),
+			TASK_PRIORITY_HIGH,
 			NULL);
 
 	/*

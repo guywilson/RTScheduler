@@ -68,22 +68,11 @@ OBJDUMPFLAGS=-I $(SRC) -f -s -l -S
 # Size tool flags
 SFLAGS=-C --mcu=$(DEVICE)
 
-# Scheduler object files
-SCHEDOBJ=$(BUILD)/scheduler.o
-
 # Object files
-OBJFILES=$(SCHEDOBJ) $(BUILD)/led_utils.o $(BUILD)/heartbeat.o $(BUILD)/rtc_atmega328p.o $(BUILD)/error_atmega328p.o $(BUILD)/main.o
+OBJFILES=$(BUILD)/led_utils.o $(BUILD)/heartbeat.o $(BUILD)/rtc_atmega328p.o $(BUILD)/error_atmega328p.o $(BUILD)/main.o
 
 # Target
 all: $(TARGET)
-
-###############################################################################
-#
-# Scheduler files
-#
-###############################################################################
-$(BUILD)/scheduler.o: $(SCHEDSRC)/scheduler.c $(SCHEDSRC)/scheduler.h $(SCHEDSRC)/schederr.h
-	$(CC) $(CFLAGS) -o $(BUILD)/scheduler.o $(SCHEDSRC)/scheduler.c
 
 ###############################################################################
 #
@@ -93,16 +82,16 @@ $(BUILD)/scheduler.o: $(SCHEDSRC)/scheduler.c $(SCHEDSRC)/scheduler.h $(SCHEDSRC
 $(BUILD)/led_utils.o: $(SRC)/led_utils.c $(SRC)/led_utils.h
 	$(CC) $(CFLAGS) -o $(BUILD)/led_utils.o $(SRC)/led_utils.c
 
-$(BUILD)/heartbeat.o: $(SRC)/heartbeat.c $(SRC)/heartbeat.h $(SRC)/led_utils.h $(SCHEDSRC)/scheduler.h $(SRC)/taskdef.h
+$(BUILD)/heartbeat.o: $(SRC)/heartbeat.c $(SRC)/heartbeat.h $(SRC)/led_utils.h $(SRC)/taskdef.h
 	$(CC) $(CFLAGS) -o $(BUILD)/heartbeat.o $(SRC)/heartbeat.c
 
 $(BUILD)/rtc_atmega328p.o: $(SRC)/rtc_atmega328p.c $(SRC)/rtc_atmega328p.h
 	$(CC) $(CFLAGS) -o $(BUILD)/rtc_atmega328p.o $(SRC)/rtc_atmega328p.c
 
-$(BUILD)/error_atmega328p.o: $(SRC)/error_atmega328p.c $(SCHEDSRC)/schederr.h $(SRC)/led_utils.h
+$(BUILD)/error_atmega328p.o: $(SRC)/error_atmega328p.c $(SRC)/led_utils.h
 	$(CC) $(CFLAGS) -o $(BUILD)/error_atmega328p.o $(SRC)/error_atmega328p.c
 
-$(BUILD)/main.o: $(SRC)/main.c $(SCHEDSRC)/scheduler.h $(SRC)/heartbeat.h $(SRC)/taskdef.h $(SRC)/led_utils.h $(SRC)/rtc_atmega328p.h $(SCHEDSRC)/schederr.h
+$(BUILD)/main.o: $(SRC)/main.c $(SRC)/heartbeat.h $(SRC)/taskdef.h $(SRC)/led_utils.h $(SRC)/rtc_atmega328p.h
 	$(CC) $(CFLAGS) -o $(BUILD)/main.o $(SRC)/main.c
 
 ###############################################################################
@@ -111,7 +100,7 @@ $(BUILD)/main.o: $(SRC)/main.c $(SCHEDSRC)/scheduler.h $(SRC)/heartbeat.h $(SRC)
 #
 ###############################################################################
 $(BUILD)/$(ELF): $(OBJFILES)
-	$(LINKER) $(LFLAGS) -o $(BUILD)/$(ELF) $(OBJFILES) -lm
+	$(LINKER) $(LFLAGS) -o $(BUILD)/$(ELF) $(OBJFILES) -lm -lsched
 	$(OBJDUMP) $(OBJDUMPFLAGS) $(BUILD)/$(ELF) > $(PROJNAME).s
 
 ###############################################################################
