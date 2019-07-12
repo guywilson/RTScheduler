@@ -225,6 +225,8 @@ static PTASKDESC _findTaskByID(uint16_t taskID)
 static PTASKDESC _scheduleTask(PTASKDESC td, timer_t time, uint8_t priority, PTASKPARM p)
 {
 	PTASKDESC	current = NULL;
+	PTASKDESC	lastTask = NULL;
+	uint8_t		isTaskPlaced = 0;
 
 	if (td != NULL) {
 		td->startTime = _realTimeClock;
@@ -249,6 +251,7 @@ static PTASKDESC _scheduleTask(PTASKDESC td, timer_t time, uint8_t priority, PTA
 						td->prev = current->prev;
 						td->next = current;
 						((PTASKDESC)(current->prev))->next = td;
+						isTaskPlaced = 1;
 						break;
 					}
 				}
@@ -264,12 +267,24 @@ static PTASKDESC _scheduleTask(PTASKDESC td, timer_t time, uint8_t priority, PTA
 							td->prev = current->prev;
 							td->next = current;
 							((PTASKDESC)(current->prev))->next = td;
+							isTaskPlaced = 1;
 							break;
 						}
 					}
 				}
 
+				lastTask = current;
 				current = current->next;
+			}
+
+			/*
+			** If we haven't placed the task yet, it must
+			**  belong at the end of the queue...
+			*/
+			if (!isTaskPlaced) {
+				td->prev = lastTask;
+				lastTask->next = td;
+				td->next = NULL;
 			}
 		}
 		else {
