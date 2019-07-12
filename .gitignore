@@ -1,2 +1,2 @@
 libsched.a
-build/scheduler.o
+build/*
