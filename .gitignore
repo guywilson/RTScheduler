@@ -1,2 +1,4 @@
-libsched.a
-build/*
+sched/lib/libsched.a
+sched/build/*
+example/build/*
+test/build/*

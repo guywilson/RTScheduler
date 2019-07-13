@@ -23,6 +23,38 @@ typedef uint64_t				timer_t;
 
 #define MAX_TIMER_VALUE			~((timer_t)0)
 
+#ifdef UNIT_TEST_MODE
+/******************************************************************************
+**
+** The TASKDESC struct.
+**
+** Holds the per-task info for the scheduler.
+**
+******************************************************************************/
+typedef struct
+{
+	uint16_t		ID;				// Unique user-assigned ID
+	timer_t			startTime;		// The RTC value when scheduleTask() was callled
+	timer_t			scheduledTime;	// The RTC value when the task should run
+	timer_t			delay;			// The requested delay (in ms) of when the task should run
+	uint8_t			priority;		// Task priority 0 (highest) to 5 (lowest)
+	uint8_t			type;			// Task type - Periodic, On-demand
+	uint8_t			isScheduled;	// Is this task scheduled
+	uint8_t			isAllocated;	// Is this allocated to a task
+	PTASKPARM		pParameter;		// The parameters to the task
+	
+	void (* run)(PTASKPARM);		// Pointer to the task function to run
+									// Must be of the form void task(PTASKPARM p);
+	void * 			next;
+	void *			prev;
+}
+TASKDESC;
+
+typedef TASKDESC *	PTASKDESC;
+
+PTASKDESC getScheduledTasks();
+#endif
+
 /*
 ** Passed as the time parameter to scheduleTask.
 */

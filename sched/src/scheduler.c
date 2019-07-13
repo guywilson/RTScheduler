@@ -13,12 +13,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef UNIT_TEST_MODE
+#include <unistd.h>
+#endif
+
 #include "scheduler.h"
 #include "schederr.h"
 
 #define CHECK_TIMER_OVERFLOW
-#define TRACK_CPU_PCT
+//#define TRACK_CPU_PCT
 
+#ifndef UNIT_TEST_MODE
 /******************************************************************************
 **
 ** The TASKDESC struct.
@@ -46,6 +51,7 @@ typedef struct
 TASKDESC;
 
 typedef TASKDESC *	PTASKDESC;
+#endif
 
 /******************************************************************************
 **
@@ -254,6 +260,16 @@ static PTASKDESC _scheduleTask(PTASKDESC td, timer_t time, uint8_t priority, PTA
 						isTaskPlaced = 1;
 						break;
 					}
+					else {
+						/*
+						** We must be inserting at the head of the queue...
+						*/
+						td->next = current;
+						current->prev = td;
+						isTaskPlaced = 1;
+						head = td;
+						break;
+					}
 				}
 				else if (current->scheduledTime == td->scheduledTime) {
 					/*
@@ -268,6 +284,16 @@ static PTASKDESC _scheduleTask(PTASKDESC td, timer_t time, uint8_t priority, PTA
 							td->next = current;
 							((PTASKDESC)(current->prev))->next = td;
 							isTaskPlaced = 1;
+							break;
+						}
+						else {
+							/*
+							** We must be inserting at the head of the queue...
+							*/
+							td->next = current;
+							current->prev = td;
+							isTaskPlaced = 1;
+							head = td;
 							break;
 						}
 					}
@@ -303,6 +329,13 @@ static PTASKDESC _scheduleTask(PTASKDESC td, timer_t time, uint8_t priority, PTA
 
 	return td;
 }
+
+#ifdef UNIT_TEST_MODE
+PTASKDESC getScheduledTasks()
+{
+	return head;
+}
+#endif
 
 /******************************************************************************
 **
@@ -640,6 +673,12 @@ void schedule()
 					head = (PTASKDESC)(td->next);
 					td->next = NULL;
 				}
+				else {
+					/*
+					** If this is the last scheduled task...
+					*/
+					head = NULL;
+				}
 				
 				signalBusy();
 
@@ -656,5 +695,8 @@ void schedule()
 				}
 			}
 		}
+#ifdef UNIT_TEST_MODE
+		usleep(1000L);
+#endif
 	}
 }
