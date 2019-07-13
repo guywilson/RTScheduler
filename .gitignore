@@ -2,3 +2,4 @@ sched/lib/libsched.a
 sched/build/*
 example/build/*
 test/build/*
+test/rtstest
