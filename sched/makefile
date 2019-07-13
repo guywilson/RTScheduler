@@ -23,6 +23,9 @@ BUILD=build
 # Source directory
 SRC=src
 
+# Library directory
+LIBDIR=lib
+
 # C compiler
 CC=avr-gcc
 
@@ -55,12 +58,12 @@ $(BUILD)/scheduler.o: $(SRC)/scheduler.c $(SRC)/scheduler.h $(SRC)/schederr.h
 #
 ###############################################################################
 $(TARGET): $(OBJFILES)
-	$(LIBTOOL) $(LIBFLAGS) $(TARGET) $(OBJFILES)
+	$(LIBTOOL) $(LIBFLAGS) $(LIBDIR)/$(TARGET) $(OBJFILES)
 
 install:
-	cp $(TARGET) /usr/local/Cellar/avr-gcc/9.1.0/lib/avr-gcc/9/gcc/avr/9.1.0
+	cp $(LIBDIR)/$(TARGET) /usr/local/Cellar/avr-gcc/9.1.0/lib/avr-gcc/9/gcc/avr/9.1.0
 	cp $(SRC)/*.h /usr/local/Cellar/avr-gcc/9.1.0/lib/avr-gcc/9/gcc/avr/9.1.0/include
 	
 clean: 
 	rm $(BUILD)/*
-	rm $(TARGET)
+	rm $(LIBDIR)/$(TARGET)
