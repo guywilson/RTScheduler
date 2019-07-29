@@ -34,14 +34,13 @@ void main(void)
 	 */
     sei();
 	
-	initScheduler();
+	initScheduler(1);
 
 	registerTask(TASK_HEARTBEAT, &HeartbeatTask);
 
 	scheduleTask(
 			TASK_HEARTBEAT,
 			rtc_val_ms(950),
-			TASK_PRIORITY_HIGH,
 			NULL);
 
 	/*

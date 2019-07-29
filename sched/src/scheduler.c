@@ -14,6 +14,7 @@
 #include <string.h>
 
 #ifdef UNIT_TEST_MODE
+#include <stdio.h>
 #include <unistd.h>
 #endif
 
@@ -37,8 +38,6 @@ typedef struct
 	timer_t			startTime;		// The RTC value when scheduleTask() was callled
 	timer_t			scheduledTime;	// The RTC value when the task should run
 	timer_t			delay;			// The requested delay (in ms) of when the task should run
-	uint8_t			priority;		// Task priority 0 (highest) to 5 (lowest)
-	uint8_t			type;			// Task type - Periodic, On-demand
 	uint8_t			isScheduled;	// Is this task scheduled
 	uint8_t			isAllocated;	// Is this allocated to a task
 	PTASKPARM		pParameter;		// The parameters to the task
@@ -85,10 +84,13 @@ void _nullTickTask()
 	// Do nothing...
 }
 
-TASKDESC					taskDescs[MAX_TASKS];	// Array of tasks for the scheduler
+PTASKDESC					taskDescs;				// Array of tasks for the scheduler, allocated in initScheduler()
+int							taskArrayLength;		// Length of the task array, e.g. num tasks allocated
+
 int							taskCount = 0;			// Number of tasks registered
 
-PTASKDESC					head = NULL;			// Pointer to the head of the scheduled task queue
+PTASKDESC					head = NULL;			// Pointer to the beginning of the registered task queue
+PTASKDESC					tail = NULL;			// Pointer to the end of the registered task queue
 
 volatile uint32_t 			_realTimeClock = 0;		// The real time clock counter
 volatile uint16_t			_tickCount = 0;			// Num ticks between rtc counts
@@ -98,6 +100,8 @@ volatile uint32_t			_idleCount = 0;
 
 // The RTC tick task...
 void 						(* _tickTask)() = &_nullTickTask;
+
+#define getRTCClockCount()	(_realTimeClock)
 
 #ifdef TRACK_CPU_PCT
 #define signalBusy()		_busyCount++
@@ -139,7 +143,6 @@ void _rtcISR()
 	 * This must be a very fast operation, as it is outside of
 	 * the scheduler's control. Also, there can be only 1 tick task...
 	 */
-	signalBusy();
 	_tickTask();
 }
 
@@ -201,7 +204,7 @@ static PTASKDESC _findTaskByID(uint16_t taskID)
 	int			i = 0;
 	PTASKDESC	td = NULL;
 
-	for (i = 0;i < MAX_TASKS;i++) {
+	for (i = 0;i < taskArrayLength;i++) {
 		td = &taskDescs[i];
 		
 		if (td->ID == taskID) {
@@ -212,128 +215,20 @@ static PTASKDESC _findTaskByID(uint16_t taskID)
 	return td;
 }
 
-/******************************************************************************
-**
-** Name: _scheduleTask()
-**
-** Description: Schedules the task to run after the specified delay. A task
-** must be registered using registerTask() before it can be scheduled.
-**
-** Parameters:	
-** uint16_t		taskID		The unique ID for the task
-** timer_t		time		Number of ms in the future for the task to run
-** uint8_t		priority	The priority of the task
-** PTASKPARM	p			Pointer to the task parameters, can be NULL
-**
-** Returns:		A pointer to the task definition 
-**
-******************************************************************************/
-static PTASKDESC _scheduleTask(PTASKDESC td, timer_t time, uint8_t priority, PTASKPARM p)
-{
-	PTASKDESC	current = NULL;
-	PTASKDESC	lastTask = NULL;
-	uint8_t		isTaskPlaced = 0;
-
-	if (td != NULL) {
-		td->startTime = _realTimeClock;
-		td->delay = time;
-		td->scheduledTime = _getScheduledTime(td->startTime, td->delay);
-		td->priority = priority;
-		td->isScheduled = 1;
-		td->pParameter = p;
-
-		if (head != NULL) {
-			current = head;
-
-			/*
-			** Iterate to the end of the list...
-			*/
-			while (current != NULL) {
-				if (current->scheduledTime > td->scheduledTime) {
-					/*
-					** Insert our task in here...
-					*/
-					if (current->prev != NULL) {
-						td->prev = current->prev;
-						td->next = current;
-						((PTASKDESC)(current->prev))->next = td;
-						isTaskPlaced = 1;
-						break;
-					}
-					else {
-						/*
-						** We must be inserting at the head of the queue...
-						*/
-						td->next = current;
-						current->prev = td;
-						isTaskPlaced = 1;
-						head = td;
-						break;
-					}
-				}
-				else if (current->scheduledTime == td->scheduledTime) {
-					/*
-					** Now it's a question of priority...
-					*/
-					if (current->priority >= td->priority) {
-						/*
-						** Insert our task in here...
-						*/
-						if (current->prev != NULL) {
-							td->prev = current->prev;
-							td->next = current;
-							((PTASKDESC)(current->prev))->next = td;
-							isTaskPlaced = 1;
-							break;
-						}
-						else {
-							/*
-							** We must be inserting at the head of the queue...
-							*/
-							td->next = current;
-							current->prev = td;
-							isTaskPlaced = 1;
-							head = td;
-							break;
-						}
-					}
-				}
-
-				lastTask = current;
-				current = current->next;
-			}
-
-			/*
-			** If we haven't placed the task yet, it must
-			**  belong at the end of the queue...
-			*/
-			if (!isTaskPlaced) {
-				td->prev = lastTask;
-				lastTask->next = td;
-				td->next = NULL;
-			}
-		}
-		else {
-			/*
-			** This must be the first task...
-			*/
-			head = td;
-
-			/*
-			** Point its next & prev ptrs to NULL...
-			*/
-			head->next = NULL;
-			head->prev = NULL;
-		}
-	}
-
-	return td;
-}
-
 #ifdef UNIT_TEST_MODE
-PTASKDESC getScheduledTasks()
+PTASKDESC getRegisteredTasks()
 {
 	return head;
+}
+
+int isLastTask(PTASKDESC td)
+{
+	if (td == tail) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
 }
 #endif
 
@@ -376,27 +271,48 @@ void getCPURatio(uint32_t * idleCount, uint32_t * busyCount)
 ** Description: Initialises the scheduler, must be called before any other
 ** scheduler API functions.
 **
-** Parameters:	N/A
+** Parameters:	int		size		Size of the task array
 **
 ** Returns:		void 
 **
 ******************************************************************************/
-void initScheduler()
+void initScheduler(int size)
 {
 	int			i = 0;
 	PTASKDESC	td = NULL;
 	
+	if (size <= 0) {
+		taskArrayLength = DEFAULT_MAX_TASKS;
+	}
+	else if (size > DEFAULT_MAX_TASKS) {
+		taskArrayLength = DEFAULT_MAX_TASKS;
+	}
+	else {
+		taskArrayLength = size;
+	}
+
+#ifdef UNIT_TEST_MODE
+printf("Allocated %d tasks\n", taskArrayLength);
+#endif
+
+	/*
+	** Allocate memory for task array...
+	*/
+	taskDescs = (PTASKDESC)malloc(taskArrayLength * sizeof(TASKDESC));
+
+	if (taskDescs == NULL) {
+		handleError(ERROR_SCHED_TASKCOUNTOVERFLOW);
+	}
+
 	taskCount = 0;
 	
-	for (i = 0;i < MAX_TASKS;i++) {
+	for (i = 0;i < taskArrayLength;i++) {
 		td = &taskDescs[i];
 		
 		td->ID				= 0;
 		td->startTime		= 0;
 		td->scheduledTime	= 0;
 		td->delay			= 0;
-		td->priority		= TASK_PRIORITY_NORMAL;
-		td->type			= TASK_TYPE_ON_DEMAND;
 		td->isScheduled		= 0;
 		td->isAllocated		= 0;
 		td->pParameter		= NULL;
@@ -442,7 +358,7 @@ void registerTask(uint16_t taskID, void (* run)(PTASKPARM))
 	PTASKDESC	td = NULL;
 	uint8_t		noFreeTasks = 1;
 
-	for (i = 0;i < MAX_TASKS;i++) {
+	for (i = 0;i < taskArrayLength;i++) {
 		td = &taskDescs[i];
 
 		if (!td->isAllocated) {
@@ -453,6 +369,27 @@ void registerTask(uint16_t taskID, void (* run)(PTASKPARM))
 			taskCount++;
 			noFreeTasks = 0;
 
+			if (tail != NULL) {
+				/*
+				** Insert our task here (at the end of the queue)...
+				*/
+				td->prev = tail;
+				td->next = head;
+				tail->next = td;
+				tail = td;
+			}
+			else {
+				/*
+				** This must be the first task...
+				*/
+				head = tail = td;
+
+				/*
+				** Point its next & prev ptrs to itself...
+				*/
+				head->next = head;
+				head->prev = head;
+			}
 			break;
 		}
 	}
@@ -460,7 +397,7 @@ void registerTask(uint16_t taskID, void (* run)(PTASKPARM))
 	if (noFreeTasks) {
 		handleError(ERROR_SCHED_NOFREETASKS);
 	}
-	if (taskCount > MAX_TASKS) {
+	if (taskCount > taskArrayLength) {
 		handleError(ERROR_SCHED_TASKCOUNTOVERFLOW);
 	}
 }
@@ -494,6 +431,16 @@ void deregisterTask(uint16_t taskID)
 		td->run				= &_nullTask;
 		
 		taskCount--;
+
+		/*
+		** Unlink the task from the registered queue...
+		*/
+		((PTASKDESC)(td->prev))->next = td->next;
+		((PTASKDESC)(td->next))->prev = td->prev;
+
+		if (head == tail) {
+			head = tail = NULL;
+		}
 	}
 }
 
@@ -513,47 +460,19 @@ void deregisterTask(uint16_t taskID)
 ** Returns:		void 
 **
 ******************************************************************************/
-void scheduleTask(uint16_t taskID, timer_t time, uint8_t priority, PTASKPARM p)
+void scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p)
 {
 	PTASKDESC	td = NULL;
 
 	td = _findTaskByID(taskID);
 
 	if (td != NULL) {
-		_scheduleTask(td, time, priority, p);
+		td->startTime = getRTCClockCount();
+		td->delay = time;
+		td->scheduledTime = _getScheduledTime(td->startTime, td->delay);
+		td->isScheduled = 1;
+		td->pParameter = p;
 	}
-
-	td->type = TASK_TYPE_ON_DEMAND;	
-}
-
-/******************************************************************************
-**
-** Name: scheduleTaskPeriodic()
-**
-** Description: Schedules the task to run continuosly after the specified 
-** delay. A task must be registered using registerTask() before it can be 
-** scheduled.
-**
-** Parameters:	
-** uint16_t		taskID		The unique ID for the task
-** timer_t		time		Number of ms in the future for the task to run
-** uint8_t		priority	The priority of the task
-** PTASKPARM	p			Pointer to the task parameters, can be NULL
-**
-** Returns:		void 
-**
-******************************************************************************/
-void scheduleTaskPeriodic(uint16_t taskID, timer_t time, uint8_t priority, PTASKPARM p)
-{
-	PTASKDESC	td = NULL;
-
-	td = _findTaskByID(taskID);
-
-	if (td != NULL) {
-		_scheduleTask(td, time, priority, p);
-	}
-
-	td->type = TASK_TYPE_PERIODIC;	
 }
 
 /******************************************************************************
@@ -584,7 +503,10 @@ void rescheduleTask(uint16_t taskID, PTASKPARM p)
 	td = _findTaskByID(taskID);
 
 	if (td != NULL) {
-		_scheduleTask(td, td->delay, td->priority, p);
+		td->startTime = getRTCClockCount();
+		td->scheduledTime = _getScheduledTime(td->startTime, td->delay);
+		td->isScheduled = 1;
+		td->pParameter = p;
 	}
 }
 
@@ -612,19 +534,6 @@ void unscheduleTask(uint16_t taskID)
 		td->scheduledTime = 0;
 		td->isScheduled = 0;
 		td->pParameter = NULL;
-
-		/*
-		** Unlink the task from the scheduled queue...
-		*/
-		if (td->prev != NULL) {
-			((PTASKDESC)(td->prev))->next = td->next;
-		}
-		if (td->next != NULL) {
-			((PTASKDESC)(td->next))->prev = td->prev;
-		}
-
-		td->next = NULL;
-		td->prev = NULL;
 	}
 }
 
@@ -642,61 +551,39 @@ void unscheduleTask(uint16_t taskID)
 ******************************************************************************/
 void schedule()
 {
-	PTASKDESC	td = NULL;
+	PTASKDESC	td = head;
 	
+	/*
+	** If no tasks have been registered, just loop until some are...
+	*/
+	while (td == NULL);
+
 	/*
 	** Scheduler loop, run forever waiting for tasks to be
 	** scheduled...
 	*/
 	while (1) {
-		/*
-		** Get the task at the head of the scheduled queue...
-		*/
-		td = head;
-		
 		signalIdle();
 
-		if (td != NULL) {
-			if (_realTimeClock >= td->scheduledTime) {
-				/*
-				** Mark the task as un-scheduled, so by default the
-				** task will not run again automatically. If the task
-				** reschedules itself, this flag will be reset to 1...
-				*/
-				td->isScheduled = 0;
+		if (td->isScheduled && getRTCClockCount() >= td->scheduledTime) {
+			/*
+			** Mark the task as un-scheduled, so by default the
+			** task will not run again automatically. If the task
+			** reschedules itself, this flag will be reset to 1...
+			*/
+			td->isScheduled = 0;
 
-				/*
-				** Unlink the task...
-				*/
-				if (td->next != NULL) {
-					((PTASKDESC)(td->next))->prev = NULL;
-					head = (PTASKDESC)(td->next);
-					td->next = NULL;
-				}
-				else {
-					/*
-					** If this is the last scheduled task...
-					*/
-					head = NULL;
-				}
-				
-				signalBusy();
-
-				/*
-				** Run the task...
-				*/
-				td->run(td->pParameter);
-
-				/*
-				** If the task type is periodic, reschedule the task...
-				*/
-				if (td->type == TASK_TYPE_PERIODIC && !td->isScheduled) {
-					rescheduleTask(td->ID, td->pParameter);
-				}
-			}
+			/*
+			** Run the task...
+			*/
+			signalBusy();
+			td->run(td->pParameter);
 		}
+
+		td = td->next;
+
 #ifdef UNIT_TEST_MODE
-		usleep(1000L);
+		usleep(500L);
 #endif
 	}
 }

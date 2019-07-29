@@ -2,57 +2,106 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "sched_utils.h"
 #include "../../sched/src/scheduler.h"
+#include "taskdef.h"
 
-void testTask1(PTASKPARM p)
+
+void wdtTask(PTASKPARM p)
 {
-    printf("In test task 1\n");
+    printf("In wdt task\n");
+    rescheduleTask(TASK_WDT, p);
 }
 
-void testTask2(PTASKPARM p)
+void heartbeatTask(PTASKPARM p)
 {
-    printf("In test task 2\n");
+	static uint8_t on = 0;
+
+    if (on) {
+        on = 0;
+        printf("Turn off... \n");
+		scheduleTask(TASK_HEARTBEAT, 950, NULL);
+    }
+    else {
+        on = 1;
+        printf("Turn on...\n");
+		scheduleTask(TASK_HEARTBEAT, 50, NULL);
+    }
 }
 
-void testTask3(PTASKPARM p)
+void adcTask(PTASKPARM p)
 {
-    printf("In test task 3\n");
+    //printf("In adc task\n");
+    rescheduleTask(TASK_ADC, p);
 }
 
-void testTask4(PTASKPARM p)
+void anemometerTask(PTASKPARM p)
 {
-    printf("In test task 4\n");
+    printf("In anemometer task\n");
+    rescheduleTask(TASK_ANEMOMETER, p);
+}
+
+void rainGaugeTask(PTASKPARM p)
+{
+    printf("In rain gauge task\n");
+    rescheduleTask(TASK_RAINGUAGE, p);
+}
+
+void rxTask(PTASKPARM p)
+{
+    printf("In rx task\n");
 }
 
 int main(void)
 {
+    int             loop = 1;
     PTASKDESC       task;
 
     initSchedUtils();
 
-    initScheduler();
+    initScheduler(6);
 
-    registerTask(0x0100, &testTask1);
-    registerTask(0x0200, &testTask2);
-    registerTask(0x0300, &testTask3);
-    registerTask(0x0400, &testTask4);
+	registerTask(TASK_WDT, &wdtTask);
+	registerTask(TASK_HEARTBEAT, &heartbeatTask);
+	registerTask(TASK_ADC, &adcTask);
+	registerTask(TASK_ANEMOMETER, &anemometerTask);
+	registerTask(TASK_RAINGUAGE, &rainGaugeTask);
+	registerTask(TASK_RXCMD, &rxTask);
 
-    scheduleTask(0x0100, 1000, TASK_PRIORITY_NORMAL, NULL);
-    scheduleTask(0x0200, 800, TASK_PRIORITY_NORMAL, NULL);
-    scheduleTask(0x0300, 2000, TASK_PRIORITY_NORMAL, NULL);
-    scheduleTask(0x0400, 1000, TASK_PRIORITY_HIGH, NULL);
+	scheduleTask(
+			TASK_WDT,
+			250,
+ 			NULL);
 
-    task = getScheduledTasks();
+	scheduleTask(
+			TASK_HEARTBEAT,
+			3,
+			NULL);
 
-    while (task != NULL) {
+	scheduleTask(
+			TASK_ANEMOMETER,
+			1000,
+			NULL);
+
+	scheduleTask(
+			TASK_RAINGUAGE,
+			3600000,
+			NULL);
+
+    task = getRegisteredTasks();
+
+    while (loop) {
+        if (isLastTask(task)) {
+            loop = 0;
+        }
+
         printf("Listing task details\n");
         printf("Task ID: 0x%04X\n", task->ID);
         printf("Start time: %d\n", task->startTime);
         printf("Scheduled time: %d\n", task->scheduledTime);
         printf("Requested delay: %d\n", task->delay);
-        printf("Priority: %d\n", (uint8_t)task->priority);
         printf("IsAllocated: %s\n", (task->isAllocated == 1 ? "true" : "false"));
         printf("IsScheduled: %s\n", (task->isScheduled == 1 ? "true" : "false"));
         printf("\n\n");
@@ -60,6 +109,8 @@ int main(void)
         task = task->next;
     }
 
+    triggerADC();
+    
     printf("Starting scheduler...\n");
 
     schedule();

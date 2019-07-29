@@ -59,7 +59,7 @@ $(BUILD)/scheduler.o: $(SCHEDSRC)/scheduler.c $(SCHEDSRC)/scheduler.h
 #
 ###############################################################################
 $(TARGET): $(OBJFILES)
-	$(LINKER) -lpthread -lstdc++ -o $(TARGET) $(OBJFILES)
+	$(LINKER) -lpthread -o $(TARGET) $(OBJFILES)
 
 clean: 
 	rm $(BUILD)/*

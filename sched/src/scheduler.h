@@ -3,7 +3,7 @@
 #ifndef _INCL_SCHEDULER
 #define _INCL_SCHEDULER
 
-#define MAX_TASKS           	32
+#define DEFAULT_MAX_TASKS       16
 
 typedef void *					PTASKPARM;
 
@@ -52,33 +52,14 @@ TASKDESC;
 
 typedef TASKDESC *	PTASKDESC;
 
-PTASKDESC getScheduledTasks();
+PTASKDESC 	getRegisteredTasks();
+int 		isLastTask(PTASKDESC td);
 #endif
 
 /*
 ** Passed as the time parameter to scheduleTask.
 */
 #define RUN_NOW                 0
-
-/******************************************************************************
-**
-** Task priorities
-**
-******************************************************************************/
-#define TASK_PRIORITY_HIGHEST   0
-#define TASK_PRIORITY_HIGH      1
-#define TASK_PRIORITY_MED_HIGH  2
-#define TASK_PRIORITY_NORMAL    3
-#define TASK_PRIORITY_LOW       4
-#define TASK_PRIORITY_LOWEST    5
-
-/******************************************************************************
-**
-** Task types
-**
-******************************************************************************/
-#define TASK_TYPE_PERIODIC      0x01
-#define TASK_TYPE_ON_DEMAND     0x02
 
 /*
  * If, for example, you want a faster interrupt frequency for the
@@ -106,15 +87,14 @@ void getCPURatio(uint32_t * idleCount, uint32_t * busyCount);
 ** The scheduler API
 **
 ******************************************************************************/
-void		initScheduler();
+void 		initScheduler(int size);
 
 void        registerTickTask(void (* tickTask)());
 
 void		registerTask(uint16_t taskID, void (* run)(PTASKPARM));
 void		deregisterTask(uint16_t taskID);
 
-void        scheduleTask(uint16_t taskID, timer_t time, uint8_t priority, PTASKPARM p);
-void        scheduleTaskPeriodic(uint16_t taskID, timer_t time, uint8_t priority, PTASKPARM p);
+void        scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p);
 void		rescheduleTask(uint16_t taskID, PTASKPARM p);
 void		unscheduleTask(uint16_t taskID);
 
