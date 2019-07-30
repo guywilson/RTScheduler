@@ -1,4 +1,4 @@
-#define VERSION_STRING      "1.2.01 2019-07-30 17:37:20"
+#define VERSION_STRING      "1.2.01 2019-07-30 21:30:19"
 
 const char * getSchedulerVersion()
 {
