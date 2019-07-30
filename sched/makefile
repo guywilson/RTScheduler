@@ -72,8 +72,8 @@ $(TARGET): $(OBJFILES)
 	$(LIBTOOL) $(LIBFLAGS) $(LIBDIR)/$(TARGET) $(OBJFILES)
 
 install:
-	cp $(LIBDIR)/$(TARGET) /usr/local/Cellar/avr-gcc/9.1.0/lib/avr-gcc/9/gcc/avr/9.1.0
-	cp $(SRC)/*.h /usr/local/Cellar/avr-gcc/9.1.0/lib/avr-gcc/9/gcc/avr/9.1.0/include
+	cp $(LIBDIR)/$(TARGET) /usr/lib/gcc/avr/5.4.0
+	cp $(SRC)/*.h /usr/lib/gcc/avr/5.4.0/include
 	
 clean: 
 	rm $(BUILD)/*
