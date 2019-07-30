@@ -24,9 +24,14 @@ The scheduler API is quite simple, the sequence of events on start-up of your ap
 
 ## The API
 
-### void initScheduler();
+### void initScheduler(int size);
 
 Initialises the scheduler task structure. This must be called before any other scheduler API functions.
+
+Parameters:
+
+                int size                  number of task descriptors to allocate, if this is <= 0 or > MAX_TASKS then
+                                          the number of task descriptors is set to MAX_TASKS.
 
 ### void registerTask(uint16_t taskID, void (* run)(PTASKPARM));
 
