@@ -17,6 +17,10 @@ ARCHSIZE=8
 # What is our target
 TARGET=$(PROJNAME).a
 
+# Version number
+MAJOR_VERSION=1
+MINOR_VERSION=2.01
+
 # Build output directory
 BUILD=build
 
@@ -25,6 +29,9 @@ SRC=src
 
 # Library directory
 LIBDIR=lib
+
+# Version template dir
+VERSION_DIR=template
 
 # C compiler
 CC=avr-gcc
@@ -39,7 +46,7 @@ CFLAGS=-c -O1 -Wall -ffunction-sections -fdata-sections -mmcu=$(DEVICE) -DF_CPU=
 LIBFLAGS=rcs
 
 # Scheduler object files
-OBJFILES=$(BUILD)/scheduler.o
+OBJFILES=$(BUILD)/scheduler.o $(BUILD)/version.o
 
 # Target
 all: $(TARGET)
@@ -50,7 +57,11 @@ all: $(TARGET)
 #
 ###############################################################################
 $(BUILD)/scheduler.o: $(SRC)/scheduler.c $(SRC)/scheduler.h $(SRC)/schederr.h
+	vbuild -o $(SRC)/version.c -ma $(MAJOR_VERSION) -mi $(MINOR_VERSION) -t template/version.template.c
 	$(CC) $(CFLAGS) -o $(BUILD)/scheduler.o $(SRC)/scheduler.c
+
+$(BUILD)/version.o: $(SRC)/version.c
+	$(CC) $(CFLAGS) -o $(BUILD)/version.o $(SRC)/version.c
 
 ###############################################################################
 #

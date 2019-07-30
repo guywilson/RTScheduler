@@ -3,3 +3,5 @@ sched/build/*
 example/build/*
 test/build/*
 test/rtstest
+version_builder/vbuild
+version_builder/build/*

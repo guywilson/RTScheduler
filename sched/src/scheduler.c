@@ -58,10 +58,6 @@ typedef TASKDESC *	PTASKDESC;
 **
 ** Description: Null task assigned to TASKDESC entries that are unused.
 **
-** Parameters:	PTASKPARM	p		Unused.
-**
-** Returns:		void 
-**
 ******************************************************************************/
 void _nullTask(PTASKPARM p)
 {
