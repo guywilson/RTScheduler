@@ -6,18 +6,18 @@ What do I mean by real-time scheduler in this instance? When you schedule a task
 
 The scheduler relies on a real-time clock clounter for operation, typically this is provided by a timer interrupt (a common feature on microprocessors and microcontrollers). A timer interrupt that increments the clock counter every 1ms (1000 timer per second) is a good starting point.
 
-The scheduler is written in C, seems to be reliable long-term, and has a small footprint in terms of memory usage and code space. Each task function must be of the form:
+The scheduler is written in C, is reliable long-term, and has a small footprint in terms of memory usage and code space. Tasks are defined by the user program as functions, each task function must be of the form:
 
     void task_name(PTASKPARM p);
 
 The PTASKPARM type is defined as a void * so you must cast to/from the actual type of your parameter (e.g. a ptr to a structure).
 
-Each task function should do what it needs to do as quickly as possible, it should never wait for something to happen (use interrupts to signal events).
+Each task function should do what it needs to do as quickly as possible, it should never wait for something to happen, e.g. in a loop (use interrupts to signal events or define a task that runs repeatedly to check for a condition).
 
 The scheduler API is quite simple, the sequence of events on start-up of your application should be:
 
 1. Set up the real-time clock interrupt
-2. Call initScheduler() to initialise the task structures
+2. Call initScheduler(int num_tasks) to initialise the task structures
 3. Register your tasks using the registerTask() function
 4. Schedule any tasks you want to run off the bat using the scheduleTask() function
 5. The very last call you should make is to the schedule() function, the actual scheduling loop (it **never** returns)
@@ -31,7 +31,7 @@ Initialises the scheduler task structure. This must be called before any other s
 Parameters:
 
                 int size                  number of task descriptors to allocate, if this is <= 0 or > MAX_TASKS then
-                                          the number of task descriptors is set to MAX_TASKS.
+                                          the number of task descriptors is set to MAX_TASKS (defined in scheduler.h).
 
 ### void registerTask(uint16_t taskID, void (* run)(PTASKPARM));
 
