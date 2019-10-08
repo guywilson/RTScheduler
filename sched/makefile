@@ -39,6 +39,9 @@ CC=avr-gcc
 # Linker
 LIBTOOL=avr-ar
 
+# Version builder
+VBUILD=vbuild
+
 # C compiler flags
 CFLAGS=-c -O1 -Wall -ffunction-sections -fdata-sections -mmcu=$(DEVICE) -DF_CPU=16000000L -DARDUINO=10804 -DARDUINO_ARCH_AVR -DARCH_SIZE=$(ARCHSIZE)
 
@@ -57,7 +60,6 @@ all: $(TARGET)
 #
 ###############################################################################
 $(BUILD)/scheduler.o: $(SRC)/scheduler.c $(SRC)/scheduler.h $(SRC)/schederr.h
-	vbuild -o $(SRC)/version.c -ma $(MAJOR_VERSION) -mi $(MINOR_VERSION) -t template/version.template.c
 	$(CC) $(CFLAGS) -o $(BUILD)/scheduler.o $(SRC)/scheduler.c
 
 $(BUILD)/version.o: $(SRC)/version.c
@@ -70,6 +72,9 @@ $(BUILD)/version.o: $(SRC)/version.c
 ###############################################################################
 $(TARGET): $(OBJFILES)
 	$(LIBTOOL) $(LIBFLAGS) $(LIBDIR)/$(TARGET) $(OBJFILES)
+
+version:
+	$(VBUILD) -incfile scheduler.ver -template template/version.c.template -out $(SRC)/version.c -major $(MAJOR_VERSION) -minor $(MINOR_VERSION)
 
 install:
 	cp $(LIBDIR)/$(TARGET) /usr/local/Cellar/avr-gcc/9.1.0/lib/avr-gcc/9/gcc/avr/9.1.0

@@ -84,10 +84,11 @@ void getCPURatio(uint32_t * idleCount, uint32_t * busyCount);
 
 /******************************************************************************
 **
-** Get the scheduler version string
+** Get the scheduler version string and build date
 **
 ******************************************************************************/
 const char * getSchedulerVersion();
+const char * getSchedulerBuildDate();
 
 /******************************************************************************
 **
