@@ -88,6 +88,8 @@ int							taskCount = 0;			// Number of tasks registered
 PTASKDESC					head = NULL;			// Pointer to the beginning of the registered task queue
 PTASKDESC					tail = NULL;			// Pointer to the end of the registered task queue
 
+uint32_t					_tasksRunCount = 0;		// The total number of tasks run by the scheduler
+
 volatile uint32_t 			_realTimeClock = 0;		// The real time clock counter
 volatile uint16_t			_tickCount = 0;			// Num ticks between rtc counts
 
@@ -258,6 +260,23 @@ void getCPURatio(uint32_t * idleCount, uint32_t * busyCount)
 	// Reset counters...
 	_busyCount = 0;
 	_idleCount = 0;
+}
+
+/******************************************************************************
+**
+** Name: getTaskRunCount()
+**
+** Description: Gets the total number of tasks run by the scheduler, useful
+**				for a dashboard for example.
+**
+** Parameters:	None
+**
+** Returns:		uint32_t		The number of tasks run 
+**
+******************************************************************************/
+uint32_t getTaskRunCount()
+{
+	return _tasksRunCount;
 }
 
 /******************************************************************************
@@ -574,6 +593,8 @@ void schedule()
 			*/
 			signalBusy();
 			td->run(td->pParameter);
+
+			_tasksRunCount++;
 		}
 
 		td = td->next;
