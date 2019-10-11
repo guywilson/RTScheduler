@@ -21,7 +21,7 @@
 #include "scheduler.h"
 #include "schederr.h"
 
-#define CHECK_TIMER_OVERFLOW
+//#define CHECK_TIMER_OVERFLOW
 //#define TRACK_CPU_PCT
 
 #ifndef UNIT_TEST_MODE
@@ -90,7 +90,7 @@ PTASKDESC					tail = NULL;			// Pointer to the end of the registered task queue
 
 uint32_t					_tasksRunCount = 0;		// The total number of tasks run by the scheduler
 
-volatile uint32_t 			_realTimeClock = 0;		// The real time clock counter
+volatile timer_t 			_realTimeClock = 0;		// The real time clock counter
 volatile uint16_t			_tickCount = 0;			// Num ticks between rtc counts
 
 volatile uint32_t			_busyCount = 0;
@@ -241,10 +241,6 @@ int isLastTask(PTASKDESC td)
 ** Name: getCPURatio()
 **
 ** Description: Returns the busy & idle counts.
-**              In order to calculate the ratio of busy/idle, the caller must
-**				calculate:
-**
-**				busy/idle ratio = busyCount / (idleCount - busyCount)
 **
 ** Parameters:	uint32_t *		idleCount	A pointer to a 32-bit unsigned int
 **				uint32_t *		busyCount	A pointer to a 32-bit unsigned int
@@ -252,10 +248,13 @@ int isLastTask(PTASKDESC td)
 ** Returns:		void 
 **
 ******************************************************************************/
-void getCPURatio(uint32_t * idleCount, uint32_t * busyCount)
+void getCPURatio(PCPU_RATIO cpuRatio)
 {
-	*idleCount = _idleCount;
-	*busyCount = _busyCount;
+	/*
+	** busy/idle ratio = busyCount / (idleCount - busyCount)
+	*/
+	cpuRatio->idleCount = _idleCount - _busyCount;
+	cpuRatio->busyCount = _busyCount;
 
 	// Reset counters...
 	_busyCount = 0;

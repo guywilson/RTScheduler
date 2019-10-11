@@ -3,6 +3,8 @@
 #ifndef _INCL_SCHEDULER
 #define _INCL_SCHEDULER
 
+#define TIMER_64BIT
+
 #define DEFAULT_MAX_TASKS       16
 
 typedef void *					PTASKPARM;
@@ -15,10 +17,10 @@ typedef void *					PTASKPARM;
 #define ARCH_SIZE		16
 #endif
 
-#if ARCH_SIZE <= 16
-typedef uint32_t				timer_t;
-#else
+#ifdef TIMER_64BIT
 typedef uint64_t				timer_t;
+#else
+typedef uint32_t				timer_t;
 #endif
 
 #define MAX_TIMER_VALUE			~((timer_t)0)
@@ -56,6 +58,15 @@ PTASKDESC 	getRegisteredTasks();
 int 		isLastTask(PTASKDESC td);
 #endif
 
+typedef struct
+{
+	uint32_t		idleCount;
+	uint32_t		busyCount;
+}
+CPU_RATIO;
+
+typedef CPU_RATIO *	PCPU_RATIO;
+
 /*
 ** Passed as the time parameter to scheduleTask.
 */
@@ -80,7 +91,7 @@ void        _rtcISR();
 ** Get the last recorded busy/idle CPU counts
 **
 ******************************************************************************/
-void getCPURatio(uint32_t * idleCount, uint32_t * busyCount);
+void getCPURatio(PCPU_RATIO cpuRatio);
 
 /******************************************************************************
 **
