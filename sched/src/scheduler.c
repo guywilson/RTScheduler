@@ -22,7 +22,7 @@
 #include "schederr.h"
 
 #define CHECK_TIMER_OVERFLOW
-//#define TRACK_CPU_PCT
+#define TRACK_CPU_PCT
 
 #ifndef UNIT_TEST_MODE
 /******************************************************************************
