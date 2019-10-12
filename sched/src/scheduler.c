@@ -21,7 +21,7 @@
 #include "scheduler.h"
 #include "schederr.h"
 
-#define CHECK_TIMER_OVERFLOW
+//#define CHECK_TIMER_OVERFLOW
 #define TRACK_CPU_PCT
 
 #ifndef UNIT_TEST_MODE

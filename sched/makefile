@@ -19,7 +19,7 @@ TARGET=$(PROJNAME).a
 
 # Version number
 MAJOR_VERSION=1
-MINOR_VERSION=3
+MINOR_VERSION=4
 
 # Build output directory
 BUILD=build

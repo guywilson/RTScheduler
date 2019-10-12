@@ -3,7 +3,7 @@
 #ifndef _INCL_SCHEDULER
 #define _INCL_SCHEDULER
 
-//#define TIMER_64BIT
+#define TIMER_64BIT
 
 #define DEFAULT_MAX_TASKS       16
 
