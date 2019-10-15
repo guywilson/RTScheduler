@@ -3,22 +3,21 @@
 #ifndef _INCL_SCHEDULER
 #define _INCL_SCHEDULER
 
-#define TIMER_64BIT
+#if defined ( __GNUC__ ) && defined ( __AVR__ )
+#define MAX_INT_SIZE			32
+#define CHECK_TIMER_OVERFLOW
+#else
+#define MAX_INT_SIZE			64
+#endif
 
 #define DEFAULT_MAX_TASKS       16
 
 typedef void *					PTASKPARM;
 
-/*
-** Define timer type for bit-depth of timer, change this
-** if your timer is 64-bit for example...
-*/
-#ifndef ARCH_SIZE
-#define ARCH_SIZE		16
-#endif
-
-#ifdef TIMER_64BIT
+#if MAX_INT_SIZE == 64
 typedef uint64_t				timer_t;
+#elif MAX_INT_SIZE == 32
+typedef uint32_t				timer_t;
 #else
 typedef uint32_t				timer_t;
 #endif
