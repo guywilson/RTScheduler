@@ -15,12 +15,12 @@ void HeartbeatTask(PTASKPARM p)
 		/* set pin 5 low to turn led off */
 		PORTB &= ~LED_ONBOARD;
         on = 0;
-		scheduleTask(TASK_HEARTBEAT, rtc_val_ms(950), NULL);
+		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(950), NULL);
     }
     else {
 		/* set pin 5 high to turn led on */
 		PORTB |= LED_ONBOARD;
         on = 1;
-		scheduleTask(TASK_HEARTBEAT, rtc_val_ms(50), NULL);
+		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(50), NULL);
     }
 }

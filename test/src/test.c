@@ -22,31 +22,28 @@ void heartbeatTask(PTASKPARM p)
     if (on) {
         on = 0;
         printf("Turn off... \n");
-		scheduleTask(TASK_HEARTBEAT, 950, NULL);
+		scheduleTaskOnce(TASK_HEARTBEAT, 950, NULL);
     }
     else {
         on = 1;
         printf("Turn on...\n");
-		scheduleTask(TASK_HEARTBEAT, 50, NULL);
+		scheduleTaskOnce(TASK_HEARTBEAT, 50, NULL);
     }
 }
 
 void adcTask(PTASKPARM p)
 {
     //printf("In adc task\n");
-    rescheduleTask(TASK_ADC, p);
 }
 
 void anemometerTask(PTASKPARM p)
 {
     printf("In anemometer task\n");
-    rescheduleTask(TASK_ANEMOMETER, p);
 }
 
 void rainGaugeTask(PTASKPARM p)
 {
     printf("In rain gauge task\n");
-    rescheduleTask(TASK_RAINGUAGE, p);
 }
 
 void rxTask(PTASKPARM p)
@@ -75,7 +72,7 @@ int main(void)
 			250,
  			NULL);
 
-	scheduleTask(
+	scheduleTaskOnce(
 			TASK_HEARTBEAT,
 			3,
 			NULL);

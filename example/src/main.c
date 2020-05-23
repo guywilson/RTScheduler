@@ -38,7 +38,7 @@ void main(void)
 
 	registerTask(TASK_HEARTBEAT, &HeartbeatTask);
 
-	scheduleTask(
+	scheduleTaskOnce(
 			TASK_HEARTBEAT,
 			rtc_val_ms(950),
 			NULL);

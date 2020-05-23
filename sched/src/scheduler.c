@@ -39,6 +39,7 @@ typedef struct
 	timer_t			delay;			// The requested delay (in ms) of when the task should run
 	uint8_t			isScheduled;	// Is this task scheduled
 	uint8_t			isAllocated;	// Is this allocated to a task
+	uint8_t			isPeriodic;		// Should this task run repeatdly at the specified delay
 	PTASKPARM		pParameter;		// The parameters to the task
 	
 	void (* run)(PTASKPARM);		// Pointer to the task function to run
@@ -328,6 +329,7 @@ printf("Allocated %d tasks\n", taskArrayLength);
 		td->delay			= 0;
 		td->isScheduled		= 0;
 		td->isAllocated		= 0;
+		td->isPeriodic		= 0;
 		td->pParameter		= NULL;
 		td->run				= &_nullTask;
 
@@ -484,6 +486,39 @@ void scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p)
 		td->delay = time;
 		td->scheduledTime = _getScheduledTime(td->startTime, td->delay);
 		td->isScheduled = 1;
+		td->isPeriodic = 1;
+		td->pParameter = p;
+	}
+}
+
+/******************************************************************************
+**
+** Name: scheduleTaskOnce()
+**
+** Description: Schedules the task to run after the specified delay. A task
+** must be registered using registerTask() before it can be scheduled.
+**
+** Parameters:	
+** uint16_t		taskID		The unique ID for the task
+** timer_t		time		Number of ms in the future for the task to run
+** uint8_t		priority	The priority of the task
+** PTASKPARM	p			Pointer to the task parameters, can be NULL
+**
+** Returns:		void 
+**
+******************************************************************************/
+void scheduleTaskOnce(uint16_t taskID, timer_t time, PTASKPARM p)
+{
+	PTASKDESC	td = NULL;
+
+	td = _findTaskByID(taskID);
+
+	if (td != NULL) {
+		td->startTime = getRTCClockCount();
+		td->delay = time;
+		td->scheduledTime = _getScheduledTime(td->startTime, td->delay);
+		td->isScheduled = 1;
+		td->isPeriodic = 0;
 		td->pParameter = p;
 	}
 }
@@ -494,10 +529,7 @@ void scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p)
 **
 ** Description: Reschedules the task to run again after the same delay as
 ** specified in the scheduleTask() call. Useful for calling at the end of
-** the task itself to force it to run again (after the specified delay). If
-** you have a task that always runs at a regular time, it is recommended you
-** call scheduleTaskPeriodic() which will ensure the task is run at the 
-** specified period.
+** the task itself to force it to run again (after the specified delay).
 **
 ** If you want to reschedule the task to run after a different delay, simply
 ** call scheduleTask() instead.
@@ -591,6 +623,10 @@ void schedule()
 			*/
 			signalBusy();
 			td->run(td->pParameter);
+
+			if (td->isPeriodic && !td->isScheduled) {
+				rescheduleTask(td->ID, td->pParameter);
+			}
 
 			_tasksRunCount++;
 		}

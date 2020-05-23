@@ -42,6 +42,7 @@ typedef struct
 	uint8_t			type;			// Task type - Periodic, On-demand
 	uint8_t			isScheduled;	// Is this task scheduled
 	uint8_t			isAllocated;	// Is this allocated to a task
+	uint8_t			isPeriodic;		// Should this task run repeatdly at the specified delay
 	PTASKPARM		pParameter;		// The parameters to the task
 	
 	void (* run)(PTASKPARM);		// Pointer to the task function to run
@@ -120,6 +121,7 @@ void		registerTask(uint16_t taskID, void (* run)(PTASKPARM));
 void		deregisterTask(uint16_t taskID);
 
 void        scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p);
+void        scheduleTaskOnce(uint16_t taskID, timer_t time, PTASKPARM p);
 void		rescheduleTask(uint16_t taskID, PTASKPARM p);
 void		unscheduleTask(uint16_t taskID);
 
