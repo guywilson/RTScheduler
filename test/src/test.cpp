@@ -5,13 +5,18 @@
 #include <unistd.h>
 
 #include "sched_utils.h"
+
+extern "C" {
 #include "../../sched/src/scheduler.h"
 #include "taskdef.h"
+}
+#include "logger.h"
 
+Logger & log = Logger::getInstance();
 
 void wdtTask(PTASKPARM p)
 {
-    printf("In wdt task\n");
+    log.logDebug("In wdt task");
 }
 
 void heartbeatTask(PTASKPARM p)
@@ -20,12 +25,12 @@ void heartbeatTask(PTASKPARM p)
 
     if (on) {
         on = 0;
-        printf("Turn off... \n");
+        log.logDebug("heartbeatTask - Turn off...");
 		scheduleTaskOnce(TASK_HEARTBEAT, 950, NULL);
     }
     else {
         on = 1;
-        printf("Turn on...\n");
+        log.logDebug("heartbeatTask - Turn on...");
 		scheduleTaskOnce(TASK_HEARTBEAT, 50, NULL);
     }
 }
@@ -37,17 +42,17 @@ void adcTask(PTASKPARM p)
 
 void anemometerTask(PTASKPARM p)
 {
-    printf("In anemometer task\n");
+    log.logDebug("In anemometer task");
 }
 
 void rainGaugeTask(PTASKPARM p)
 {
-    printf("In rain gauge task\n");
+    log.logDebug("In rain gauge task");
 }
 
 void rxTask(PTASKPARM p)
 {
-    printf("In rx task\n");
+    log.logDebug("In rx task");
 }
 
 int main(void)
@@ -102,12 +107,12 @@ int main(void)
         printf("IsScheduled: %s\n", (task->isScheduled == 1 ? "true" : "false"));
         printf("\n\n");
 
-        task = task->next;
+        task = (PTASKDESC)(task->next);
     }
 
     triggerADC();
     
-    printf("Starting scheduler...\n");
+    log.logDebug("Starting scheduler...");
 
     schedule();
 }

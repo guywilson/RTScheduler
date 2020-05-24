@@ -9,9 +9,6 @@
 
 PROJNAME=rtstest
 
-# Target architecture size
-ARCHSIZE=8
-
 # What is our target
 TARGET=$(PROJNAME)
 
@@ -26,15 +23,16 @@ SCHEDSRC=../sched/src
 
 # C compiler
 CC=gcc
+CPP=g++
 
 # Linker
-LINKER=gcc
+LINKER=g++
 
 # C compiler flags
-CFLAGS=-c -O1 -Wall -DF_CPU=16000000L -DARCH_SIZE=$(ARCHSIZE) -DUNIT_TEST_MODE
+CFLAGS=-c -O1 -Wall -DUNIT_TEST_MODE
 
 # Object files
-OBJFILES=$(BUILD)/test.o $(BUILD)/sched_utils.o $(BUILD)/scheduler.o
+OBJFILES=$(BUILD)/test.o $(BUILD)/strutils.o $(BUILD)/currenttime.o $(BUILD)/logger.o $(BUILD)/sched_utils.o $(BUILD)/scheduler.o
 
 # Target
 all: $(TARGET)
@@ -44,11 +42,20 @@ all: $(TARGET)
 # Project files
 #
 ###############################################################################
-$(BUILD)/test.o: $(SRC)/test.c $(SCHEDSRC)/scheduler.h
-	$(CC) $(CFLAGS) -o $(BUILD)/test.o $(SRC)/test.c
+$(BUILD)/test.o: $(SRC)/test.cpp $(SCHEDSRC)/scheduler.h
+	$(CPP) $(CFLAGS) -o $(BUILD)/test.o $(SRC)/test.cpp
 
-$(BUILD)/sched_utils.o: $(SRC)/sched_utils.c $(SCHEDSRC)/scheduler.h
-	$(CC) $(CFLAGS) -o $(BUILD)/sched_utils.o $(SRC)/sched_utils.c
+$(BUILD)/sched_utils.o: $(SRC)/sched_utils.cpp $(SRC)/sched_utils.h $(SCHEDSRC)/scheduler.h
+	$(CPP) $(CFLAGS) -o $(BUILD)/sched_utils.o $(SRC)/sched_utils.cpp
+
+$(BUILD)/currenttime.o: $(SRC)/currenttime.cpp $(SRC)/currenttime.h
+	$(CPP) $(CFLAGS) -o $(BUILD)/currenttime.o $(SRC)/currenttime.cpp
+
+$(BUILD)/logger.o: $(SRC)/logger.cpp $(SRC)/logger.h
+	$(CPP) $(CFLAGS) -o $(BUILD)/logger.o $(SRC)/logger.cpp
+
+$(BUILD)/strutils.o: $(SRC)/strutils.c $(SRC)/strutils.h
+	$(CC) $(CFLAGS) -o $(BUILD)/strutils.o $(SRC)/strutils.c
 
 $(BUILD)/scheduler.o: $(SCHEDSRC)/scheduler.c $(SCHEDSRC)/scheduler.h
 	$(CC) $(CFLAGS) -o $(BUILD)/scheduler.o $(SCHEDSRC)/scheduler.c

@@ -6,9 +6,12 @@
 #include <pthread.h>
 #include <unistd.h>
 
+extern "C" {
 #include "../../sched/src/scheduler.h"
-#include "sched_utils.h"
 #include "taskdef.h"
+}
+#include "sched_utils.h"
+#include "logger.h"
 
 pthread_t			tidISR;
 pthread_t			tidADC;
@@ -51,6 +54,11 @@ void triggerADC()
 void initSchedUtils()
 {
 	int				err;
+	int				defaultLoggingLevel = LOG_LEVEL_DEBUG | LOG_LEVEL_INFO | LOG_LEVEL_ERROR | LOG_LEVEL_FATAL;
+
+	Logger & log = Logger::getInstance();
+
+	log.initLogger(defaultLoggingLevel);
 
 	/*
 	** Start timer ISR thread...
@@ -77,10 +85,4 @@ void initSchedUtils()
 	else {
 		printf("Thread rxISRThread() created successfully\n");
 	}
-}
-
-void handleError(uint16_t errorCode)
-{
-    printf("Got scheduler error [0x%04X]\n", errorCode);
-	exit(-1);
 }
