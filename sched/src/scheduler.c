@@ -614,7 +614,8 @@ void schedule()
 			/*
 			** Mark the task as un-scheduled, so by default the
 			** task will not run again automatically. If the task
-			** reschedules itself, this flag will be reset to 1...
+			** is periodic or if the task reschedules itself, this 
+			** flag will be reset to 1...
 			*/
 			td->isScheduled = 0;
 
