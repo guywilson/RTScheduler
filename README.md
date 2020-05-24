@@ -10,7 +10,7 @@ The scheduler is written in C, is reliable long-term, and has a small footprint 
 
     void task_name(PTASKPARM p);
 
-The PTASKPARM type is defined as a void * so you must cast to/from the actual type of your parameter (e.g. a ptr to a structure).
+The PTASKPARM type is defined as a void * so you must cast to/from the actual type of your parameter (e.g. a ptr to a structure). Each task must have a user defined unique ID that is passed to the scheduler API to identify the task.
 
 Each task function should do what it needs to do as quickly as possible, it should never wait for something to happen, e.g. in a loop (use interrupts to signal events or define a task that runs repeatedly to check for a condition).
 
