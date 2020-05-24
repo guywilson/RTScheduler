@@ -39,13 +39,13 @@ void * rxISRThread(void * pArgs)
 		// cpuPct = ((double)busy * 100.0) / ((double)idle - (double)busy);
 		// printf("CPU = %d/%d (%.2f%%)\n", busy, (idle - busy), cpuPct);
 
-		scheduleTask(TASK_RXCMD, RUN_NOW, NULL);
+		scheduleTaskOnce(TASK_RXCMD, RUN_NOW, NULL);
 	}
 }
 
 void triggerADC()
 {
-	scheduleTask(TASK_ADC, 15, NULL);
+	scheduleTaskOnce(TASK_ADC, 15, NULL);
 }
 
 void initSchedUtils()

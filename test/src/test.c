@@ -12,7 +12,6 @@
 void wdtTask(PTASKPARM p)
 {
     printf("In wdt task\n");
-    rescheduleTask(TASK_WDT, p);
 }
 
 void heartbeatTask(PTASKPARM p)
