@@ -2,7 +2,7 @@
 
 ## A simple real-time scheduler for embedded applications
 
-What do I mean by real-time scheduler in this instance? When you schedule a task to run in 5ms, you know that it will run in exactly 5ms. This scheduler does not offer pre-emptive multi-tasking as you would expect from Unix or Windows, only one task will run at a time (therefore each task must complete as quickly as possible).
+What do I mean by real-time scheduler in this instance? When you schedule a task to run in 5ms, you know that it will run in exactly 5ms. This scheduler does not offer pre-emptive multi-tasking as you would expect from Unix, Windows or an RTOS, only one task will run at a time (therefore each task must complete as quickly as possible).
 
 The scheduler relies on a real-time clock clounter for operation, typically this is provided by a timer interrupt (a common feature on microprocessors and microcontrollers). A timer interrupt that increments the clock counter every 1ms (1000 timer per second) is a good starting point.
 
@@ -10,7 +10,7 @@ The scheduler is written in C, is reliable long-term, and has a small footprint 
 
     void task_name(PTASKPARM p);
 
-The PTASKPARM type is defined as a void * so you must cast to/from the actual type of your parameter (e.g. a ptr to a structure).
+The PTASKPARM type is defined as a void * so you must cast to/from the actual type of your parameter (e.g. a ptr to a structure). Each task must have a user defined unique ID that is passed to the scheduler API to identify the task.
 
 Each task function should do what it needs to do as quickly as possible, it should never wait for something to happen, e.g. in a loop (use interrupts to signal events or define a task that runs repeatedly to check for a condition).
 
