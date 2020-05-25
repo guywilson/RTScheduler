@@ -1,5 +1,5 @@
-#define __BDATE__      "2020-05-24 16:56:28"
-#define __BVERSION__   "1.5.002"
+#define __BDATE__      "2020-05-25 17:09:12"
+#define __BVERSION__   "1.5.003"
 
 const char * getSchedulerVersion()
 {
