@@ -10,7 +10,7 @@
 PROJNAME=rtsavr
 
 # Target device
-DEVICE=atmega328p
+DEVICE=cortex-m0plus
 
 # Target board
 BOARD=ARDUINO_AVR_NANO
@@ -39,25 +39,25 @@ UPLOADPORT=/dev/cu.wchusbserial1410
 CC=avr-gcc
 
 # Linker
-LINKER=avr-gcc
+LINKER=arm-none-eabi-gcc
 
 # Hex file creator
-OBJCOPY=avr-objcopy
+OBJCOPY=arm-none-eabi-objcopy
 
 # Assembly dump tool
-OBJDUMP=avr-objdump
+OBJDUMP=arm-none-eabi-objdump
 
 # Size tool
-SIZETOOL=avr-size
+SIZETOOL=arm-none-eabi-size
 
 # Upload tool
 UPLOADTOOL=./upload.sh
 
 # C compiler flags
-CFLAGS=-c -Os -Wall -ffunction-sections -fdata-sections -mmcu=$(DEVICE) -DF_CPU=16000000L -DARDUINO=10804 -D$(BOARD) -DARDUINO_ARCH_AVR -DARCH_SIZE=$(ARCHSIZE)
+CFLAGS=-c -mcpu=$(DEVICE) -mthumb -Os -Wall -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -MMD -DF_CPU=48000000L -DARDUINO=10813 -DARDUINO_SAMD_MKRWAN1310 -DARDUINO_ARCH_SAMD -DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ -DUSE_BQ24195L_PMIC -DVERY_LOW_POWER
 
 # Linker flags
-LFLAGS=-fuse-linker-plugin -Wl,--gc-sections -mmcu=$(DEVICE)
+LFLAGS=-fuse-linker-plugin -Wl,--gc-sections -mcpu=$(DEVICE)
 
 # Hex file creator flags
 OBJCOPYFLAGS=-O ihex -R .eeprom
