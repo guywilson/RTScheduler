@@ -77,9 +77,9 @@ version:
 	$(VBUILD) -incfile scheduler.ver -template template/version.c.template -out $(SRC)/version.c -major $(MAJOR_VERSION) -minor $(MINOR_VERSION)
 
 install:
-	cp $(LIBDIR)/$(TARGET) /usr/lib/gcc/avr/5.4.0
-	cp $(SRC)/*.h /usr/lib/gcc/avr/5.4.0/include
-	
-clean: 
+	cp $(LIBDIR)/$(TARGET) /usr/arm-none-eabi/lib
+	cp $(SRC)/*.h /usr/arm-none-eabi/include
+
+clean:
 	rm $(BUILD)/*
 	rm $(LIBDIR)/$(TARGET)
