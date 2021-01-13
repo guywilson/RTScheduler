@@ -1,4 +1,4 @@
-#include <avr/io.h>
+#include <samd.h>
 
 #ifndef _INCL_LEDUTILS
 #define _INCL_LEDUTILS
