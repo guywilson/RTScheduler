@@ -1,7 +1,7 @@
 #include <scheduler.h>
 
-#ifndef _INCL_RTC_ATMEGA328P
-#define _INCL_RTC_ATMEGA328P
+#ifndef _INCL_RTC_SAMD21
+#define _INCL_RTC_SAMD21
 
 /*
  * Set the RTC clock frequency to 1KHz (1ms tick). This is a

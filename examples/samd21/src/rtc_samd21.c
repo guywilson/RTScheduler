@@ -1,34 +1,27 @@
 #include <stdint.h>
-#include <avr/interrupt.h>
+#include <tc.h>
 #include <scheduler.h>
 
-#include "rtc_atmega328p.h"
+#include "rtc_samd21.h"
+
+struct tc_module			tc_instance;
 
 void setupRTC()
 {
-    // Clear registers
-    TCCR1A = 0x00;
-    TCCR1B = 0x00;
-    
-    TCNT1  = 0;
-    
-    /*
-    ** Timer value = (clock_speed / (interrupt_freq * pre-scaler)) - 1
-    ** Timer value = (16,000,000 / (1000 * 8)) - 1
-    */
-    OCR1A = (F_CPU / __CLOCK_DIVISOR) - 1;
+	struct tc_config		config_tc;
+	
+	tc_get_config_defaults(&config_tc);
+	
+	config_tc.counter_size = TC_COUNTER_SIZE_8BIT;
+	config_tc.clock_source = GCLK_GENERATOR_0;
+	config_tc.clock_prescaler = TC_CLOCK_PRESCALER_DIV4;
+	config_tc.counter_8_bit.period = 46 ; 
 
-    // turn on CTC mode
-    TCCR1B |= (1 << WGM12);
-    
-    // Set CS11 bit for 8 prescaler
-    TCCR1B |= (1 << CS11);  
-    
-    // enable timer compare interrupt
-    TIMSK1 |= (1 << OCIE1A);
+	tc_init(&tc_instance, CONF_TC_MODULE, &config_tc);
+	tc_enable(&tc_instance);
 }
 
-ISR(TIMER1_COMPA_vect, ISR_BLOCK)
-{
-	_rtcISR();
-}
+// ISR(TIMER1_COMPA_vect, ISR_BLOCK)
+// {
+// 	_rtcISR();
+// }
