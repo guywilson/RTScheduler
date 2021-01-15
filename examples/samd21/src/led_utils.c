@@ -1,4 +1,6 @@
+#include <stdint.h>
 #include <samd.h>
+#include <variant.h>
 
 #include "led_utils.h"
 
@@ -9,28 +11,22 @@ void setupLEDPin(void)
 	** On the Arduino Nano, this is connected to the
 	** onboard LED...
 	*/
-    DDRB |= _BV(DDB5);
-
-	/*
-	** Set Port B - Pin 0 as output
-	** Use a secondary external LED for testing...
-	*/
-    DDRB |= _BV(DDB0);
+    REG_PORT_DIRSET0 = (1 << LED_BUILTIN);
 }
 
-void turnOn(int LED_ID)
+void turnOn(uint32_t LED_ID)
 {
 	/* set pin 5 high to turn led on */
-	PORTB |= LED_ID;
+	REG_PORT_OUTSET0 = (1 << LED_ID);
 }
 
-void turnOff(int LED_ID)
+void turnOff(uint32_t LED_ID)
 {
 	/* set pin 5 low to turn led off */
-	PORTB &= ~LED_ID;
+	REG_PORT_OUTCLR0= (1 << LED_ID);
 }
 
-void toggleLED(int LED_ID)
+void toggleLED(uint32_t LED_ID)
 {
 	static unsigned char state = 0;
 	

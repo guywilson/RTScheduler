@@ -1,6 +1,7 @@
 #include <stddef.h>
-#include <avr/io.h>
+#include <stdint.h>
 #include <scheduler.h>
+#include <variant.h>
 
 #include "rtc_atmega328p.h"
 #include "heartbeat.h"
@@ -13,13 +14,13 @@ void HeartbeatTask(PTASKPARM p)
 	
     if (on) {
 		/* set pin 5 low to turn led off */
-		PORTB &= ~LED_ONBOARD;
+		turnOff(LED_BUILTIN);
         on = 0;
 		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(950), NULL);
     }
     else {
 		/* set pin 5 high to turn led on */
-		PORTB |= LED_ONBOARD;
+		turnOn(LED_BUILTIN);
         on = 1;
 		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(50), NULL);
     }
