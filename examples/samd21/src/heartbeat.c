@@ -3,7 +3,7 @@
 #include <scheduler.h>
 #include <variant.h>
 
-#include "rtc_atmega328p.h"
+#include "rtc_samd21.h"
 #include "heartbeat.h"
 #include "led_utils.h"
 #include "taskdef.h"

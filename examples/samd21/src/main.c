@@ -1,13 +1,12 @@
 #include <stddef.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#include <samd.h>
 
 #include <scheduler.h>
 #include <schederr.h>
 
 #include "taskdef.h"
 
-#include "rtc_atmega328p.h"
+#include "rtc_samd21.h"
 #include "heartbeat.h"
 #include "led_utils.h"
 
@@ -22,17 +21,7 @@ void setup(void)
 #pragma GCC diagnostic ignored  "-Wmain"
 void main(void)
 {
-	/*
-	 * Disable interrupts...
-	 */
-	cli();
-
 	setup();
-
-	/*
-	 * Enable interrupts...
-	 */
-    sei();
 	
 	initScheduler(1);
 

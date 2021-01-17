@@ -7,7 +7,7 @@
 #                                                                             #
 ###############################################################################
 
-PROJNAME=rtsavr
+PROJNAME=rtssamd
 
 # Target device
 DEVICE=cortex-m0plus
@@ -16,7 +16,7 @@ DEVICE=cortex-m0plus
 BOARD=ARDUINO_AVR_NANO
 
 # Target architecture size
-ARCHSIZE=8
+ARCHSIZE=32
 
 # What is our target
 ELF=$(PROJNAME).elf
@@ -59,13 +59,13 @@ SIZETOOL=arm-none-eabi-size
 UPLOADTOOL=./upload.sh
 
 # Include dir flags
-INCLUDEFLAGS=-I$(CMSISBASE)/4.5.0/CMSIS/Include/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/ -I$(SAMDBASE)/cores/arduino/api/deprecated -I$(SAMDBASE)/cores/arduino/api/deprecated-avr-comp -I$(SAMDBASE)/cores/arduino -I$(SAMDBASE)/variants/mkrwan1300
+INCLUDEFLAGS=-I$(CMSISBASE)/4.5.0/CMSIS/Include/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/samd21/include/ -I$(SAMDBASE)/cores/arduino/api/deprecated -I$(SAMDBASE)/cores/arduino/api/deprecated-avr-comp -I$(SAMDBASE)/cores/arduino -I$(SAMDBASE)/variants/mkrwan1300
 
 # C compiler flags
 CFLAGS=-c -mcpu=$(DEVICE) -mthumb -Os -Wall -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -DF_CPU=48000000L -DARDUINO=10813 -DARDUINO_SAMD_MKRWAN1310 -DARDUINO_ARCH_SAMD -DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ -DUSE_BQ24195L_PMIC -DVERY_LOW_POWER $(INCLUDEFLAGS)
 
 # Linker flags
-LFLAGS=-fuse-linker-plugin -Wl,--gc-sections -mcpu=$(DEVICE)
+LFLAGS=-fuse-linker-plugin -Wl,--gc-sections -mcpu=$(DEVICE) -L/home/guy/.arduino15/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Lib/GCC/
 
 # Hex file creator flags
 OBJCOPYFLAGS=-O ihex -R .eeprom
@@ -77,7 +77,7 @@ OBJDUMPFLAGS=-I $(SRC) -f -s -l -S
 SFLAGS=-C --mcu=$(DEVICE)
 
 # Object files
-OBJFILES=$(BUILD)/led_utils.o $(BUILD)/heartbeat.o $(BUILD)/rtc_atmega328p.o $(BUILD)/error_atmega328p.o $(BUILD)/main.o
+OBJFILES=$(BUILD)/led_utils.o $(BUILD)/heartbeat.o $(BUILD)/rtc_samd21.o $(BUILD)/error_samd21.o $(BUILD)/main.o
 
 # Target
 all: $(TARGET)
@@ -93,13 +93,13 @@ $(BUILD)/led_utils.o: $(SRC)/led_utils.c $(SRC)/led_utils.h
 $(BUILD)/heartbeat.o: $(SRC)/heartbeat.c $(SRC)/heartbeat.h $(SRC)/led_utils.h $(SRC)/taskdef.h
 	$(CC) $(CFLAGS) -o $(BUILD)/heartbeat.o $(SRC)/heartbeat.c
 
-$(BUILD)/rtc_atmega328p.o: $(SRC)/rtc_atmega328p.c $(SRC)/rtc_atmega328p.h
-	$(CC) $(CFLAGS) -o $(BUILD)/rtc_atmega328p.o $(SRC)/rtc_atmega328p.c
+$(BUILD)/rtc_samd21.o: $(SRC)/rtc_samd21.c $(SRC)/rtc_samd21.h
+	$(CC) $(CFLAGS) -o $(BUILD)/rtc_samd21.o $(SRC)/rtc_samd21.c
 
-$(BUILD)/error_atmega328p.o: $(SRC)/error_atmega328p.c $(SRC)/led_utils.h
-	$(CC) $(CFLAGS) -o $(BUILD)/error_atmega328p.o $(SRC)/error_atmega328p.c
+$(BUILD)/error_samd21.o: $(SRC)/error_samd21.c $(SRC)/led_utils.h
+	$(CC) $(CFLAGS) -o $(BUILD)/error_samd21.o $(SRC)/error_samd21.c
 
-$(BUILD)/main.o: $(SRC)/main.c $(SRC)/heartbeat.h $(SRC)/taskdef.h $(SRC)/led_utils.h $(SRC)/rtc_atmega328p.h
+$(BUILD)/main.o: $(SRC)/main.c $(SRC)/heartbeat.h $(SRC)/taskdef.h $(SRC)/led_utils.h $(SRC)/rtc_samd21.h
 	$(CC) $(CFLAGS) -o $(BUILD)/main.o $(SRC)/main.c
 
 ###############################################################################
@@ -108,7 +108,7 @@ $(BUILD)/main.o: $(SRC)/main.c $(SRC)/heartbeat.h $(SRC)/taskdef.h $(SRC)/led_ut
 #
 ###############################################################################
 $(BUILD)/$(ELF): $(OBJFILES)
-	$(LINKER) $(LFLAGS) -o $(BUILD)/$(ELF) $(OBJFILES) -lm -lsched
+	$(LINKER) $(LFLAGS) -o $(BUILD)/$(ELF) $(OBJFILES) -larm_cortexM0l_math -lm -lsched
 	$(OBJDUMP) $(OBJDUMPFLAGS) $(BUILD)/$(ELF) > $(PROJNAME).s
 
 ###############################################################################

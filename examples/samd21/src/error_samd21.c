@@ -1,6 +1,5 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <util/delay.h>                // for _delay_ms()
+#include <samd.h>
+#include <variant.h>
 
 #include <schederr.h>
 
@@ -26,30 +25,30 @@
 
 void dot()
 {
-	turnOn(LED_ONBOARD);
-	_delay_ms(150);
+	turnOn(LED_BUILTIN);
+	delay(150);
 
-	turnOff(LED_ONBOARD);
-	_delay_ms(150);
+	turnOff(LED_BUILTIN);
+	delay(150);
 }
 
 void dash()
 {
-	turnOn(LED_ONBOARD);
-	_delay_ms(750);
+	turnOn(LED_BUILTIN);
+	delay(750);
 
-	turnOff(LED_ONBOARD);
-	_delay_ms(150);
+	turnOff(LED_BUILTIN);
+	delay(150);
 }
 
 void charBreak()
 {
-	_delay_ms(500);
+	delay(500);
 }
 
 void wordBreak()
 {
-	_delay_ms(1000);
+	delay(1000);
 }
 
 /*
@@ -61,11 +60,11 @@ void wordBreak()
 void _handleNoFreeTasks()
 {
 	while (1) {
-		turnOn(LED_ONBOARD);
-        _delay_ms(ERR_ON_NOFREETASKS);
+		turnOn(LED_BUILTIN);
+        delay(ERR_ON_NOFREETASKS);
 
-		turnOff(LED_ONBOARD);
-        _delay_ms(ERR_OFF_NOFREETASKS);
+		turnOff(LED_BUILTIN);
+        delay(ERR_OFF_NOFREETASKS);
 	}
 }
 
@@ -78,11 +77,11 @@ void _handleNoFreeTasks()
 void _handleTaskCountOverFlow()
 {
 	while (1) {
-		turnOn(LED_ONBOARD);
-        _delay_ms(ERR_ON_TASKCOUNTOVERFLOW);
+		turnOn(LED_BUILTIN);
+        delay(ERR_ON_TASKCOUNTOVERFLOW);
 
-		turnOff(LED_ONBOARD);
-        _delay_ms(ERR_OFF_TASKCOUNTOVERFLOW);
+		turnOff(LED_BUILTIN);
+        delay(ERR_OFF_TASKCOUNTOVERFLOW);
 	}
 }
 
@@ -95,11 +94,11 @@ void _handleTaskCountOverFlow()
 void _handleNullTask()
 {
 	while (1) {
-		turnOn(LED_ONBOARD);
-        _delay_ms(ERR_ON_NULLTASK);
+		turnOn(LED_BUILTIN);
+        delay(ERR_ON_NULLTASK);
 
-		turnOff(LED_ONBOARD);
-        _delay_ms(ERR_OFF_NULLTASK);
+		turnOff(LED_BUILTIN);
+        delay(ERR_OFF_NULLTASK);
 	}
 }
 
@@ -112,11 +111,11 @@ void _handleNullTask()
 void _handleNullTaskExec()
 {
 	while (1) {
-		turnOn(LED_ONBOARD);
-        _delay_ms(ERR_ON_NULLTASKEXEC);
+		turnOn(LED_BUILTIN);
+        delay(ERR_ON_NULLTASKEXEC);
 
-		turnOff(LED_ONBOARD);
-        _delay_ms(ERR_OFF_NULLTASKEXEC);
+		turnOff(LED_BUILTIN);
+        delay(ERR_OFF_NULLTASKEXEC);
 	}
 }
 
@@ -129,11 +128,11 @@ void _handleNullTaskExec()
 void _handleDropout()
 {
 	while (1) {
-		turnOn(LED_ONBOARD);
-        _delay_ms(ERR_ON_DROPOUT);
+		turnOn(LED_BUILTIN);
+        delay(ERR_ON_DROPOUT);
 
-		turnOff(LED_ONBOARD);
-        _delay_ms(ERR_OFF_DROPOUT);
+		turnOff(LED_BUILTIN);
+        delay(ERR_OFF_DROPOUT);
 	}
 }
 
@@ -146,28 +145,19 @@ void _handleDropout()
 void _handleDefault()
 {
 	while (1) {
-		turnOn(LED_ONBOARD);
-        _delay_ms(ERR_ON_DEFUALT);
+		turnOn(LED_BUILTIN);
+        delay(ERR_ON_DEFUALT);
 
-		turnOff(LED_ONBOARD);
-        _delay_ms(ERR_OFF_DEFUALT);
+		turnOff(LED_BUILTIN);
+        delay(ERR_OFF_DEFUALT);
 	}
 }
 
 void handleError(unsigned int code)
 {
     //stop interrupts
-    cli();
+    __disable_irq();
     
-    // Clear timer registers
-    TCCR1A = 0x00;
-    TCCR1B = 0x00;
-    
-    TCNT1  = 0;
-
-	/* set pin 5 of PORTB for output*/
-    DDRB |= _BV(DDB5);
-
 	switch (code) {
 		case ERROR_SCHED_NOFREETASKS:
 			_handleNoFreeTasks();
