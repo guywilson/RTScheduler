@@ -15,14 +15,14 @@
 typedef void *					PTASKPARM;
 
 #if MAX_INT_SIZE == 64
-typedef uint64_t				timer_t;
+typedef uint64_t				rtc_t;
 #elif MAX_INT_SIZE == 32
-typedef uint32_t				timer_t;
+typedef uint32_t				rtc_t;
 #else
-typedef uint32_t				timer_t;
+typedef uint32_t				rtc_t;
 #endif
 
-#define MAX_TIMER_VALUE			~((timer_t)0)
+#define MAX_TIMER_VALUE			~((rtc_t)0)
 
 #ifdef UNIT_TEST_MODE
 /******************************************************************************
@@ -35,9 +35,9 @@ typedef uint32_t				timer_t;
 typedef struct
 {
 	uint16_t		ID;				// Unique user-assigned ID
-	timer_t			startTime;		// The RTC value when scheduleTask() was callled
-	timer_t			scheduledTime;	// The RTC value when the task should run
-	timer_t			delay;			// The requested delay (in ms) of when the task should run
+	rtc_t			startTime;		// The RTC value when scheduleTask() was callled
+	rtc_t			scheduledTime;	// The RTC value when the task should run
+	rtc_t			delay;			// The requested delay (in ms) of when the task should run
 	uint8_t			priority;		// Task priority 0 (highest) to 5 (lowest)
 	uint8_t			type;			// Task type - Periodic, On-demand
 	uint8_t			isScheduled;	// Is this task scheduled
@@ -120,8 +120,8 @@ void        registerTickTask(void (* tickTask)());
 void		registerTask(uint16_t taskID, void (* run)(PTASKPARM));
 void		deregisterTask(uint16_t taskID);
 
-void        scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p);
-void        scheduleTaskOnce(uint16_t taskID, timer_t time, PTASKPARM p);
+void        scheduleTask(uint16_t taskID, rtc_t time, PTASKPARM p);
+void        scheduleTaskOnce(uint16_t taskID, rtc_t time, PTASKPARM p);
 void		rescheduleTask(uint16_t taskID, PTASKPARM p);
 void		unscheduleTask(uint16_t taskID);
 

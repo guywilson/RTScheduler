@@ -34,9 +34,9 @@
 typedef struct
 {
 	uint16_t		ID;				// Unique user-assigned ID
-	timer_t			startTime;		// The RTC value when scheduleTask() was callled
-	timer_t			scheduledTime;	// The RTC value when the task should run
-	timer_t			delay;			// The requested delay (in ms) of when the task should run
+	rtc_t			startTime;		// The RTC value when scheduleTask() was callled
+	rtc_t			scheduledTime;	// The RTC value when the task should run
+	rtc_t			delay;			// The requested delay (in ms) of when the task should run
 	uint8_t			isScheduled;	// Is this task scheduled
 	uint8_t			isAllocated;	// Is this allocated to a task
 	uint8_t			isPeriodic;		// Should this task run repeatdly at the specified delay
@@ -90,7 +90,7 @@ PTASKDESC					tail = NULL;			// Pointer to the end of the registered task queue
 
 uint32_t					_tasksRunCount = 0;		// The total number of tasks run by the scheduler
 
-volatile timer_t 			_realTimeClock = 0;		// The real time clock counter
+volatile rtc_t 			_realTimeClock = 0;		// The real time clock counter
 volatile uint16_t			_tickCount = 0;			// Num ticks between rtc counts
 
 volatile uint32_t			_busyCount = 0;
@@ -151,11 +151,11 @@ void _rtcISR()
 ** Description: Calculates the future RTC value when the task should run
 **
 ** Parameters:
-**				timer_t		startTime		The RTC value when called
-**				timer_t		requestedDelay	The delay in ms before the task runs
+**				rtc_t		startTime		The RTC value when called
+**				rtc_t		requestedDelay	The delay in ms before the task runs
 **
 ** Returns: 
-**				timer_t		The future RTC value when the task should run
+**				rtc_t		The future RTC value when the task should run
 **
 ** If we don't care about checking if the timer will overflow, use a macro
 ** to calculate the default scheduled time (with risk of overflow). 
@@ -167,9 +167,9 @@ void _rtcISR()
 **
 ******************************************************************************/
 #ifdef CHECK_TIMER_OVERFLOW
-static timer_t _getScheduledTime(timer_t startTime, timer_t requestedDelay)
+static rtc_t _getScheduledTime(rtc_t startTime, rtc_t requestedDelay)
 {
-	timer_t			overflowTime;
+	rtc_t			overflowTime;
 	
 	overflowTime = MAX_TIMER_VALUE - startTime;
 	
@@ -468,14 +468,14 @@ void deregisterTask(uint16_t taskID)
 **
 ** Parameters:	
 ** uint16_t		taskID		The unique ID for the task
-** timer_t		time		Number of ms in the future for the task to run
+** rtc_t		time		Number of ms in the future for the task to run
 ** uint8_t		priority	The priority of the task
 ** PTASKPARM	p			Pointer to the task parameters, can be NULL
 **
 ** Returns:		void 
 **
 ******************************************************************************/
-void scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p)
+void scheduleTask(uint16_t taskID, rtc_t time, PTASKPARM p)
 {
 	PTASKDESC	td = NULL;
 
@@ -500,14 +500,14 @@ void scheduleTask(uint16_t taskID, timer_t time, PTASKPARM p)
 **
 ** Parameters:	
 ** uint16_t		taskID		The unique ID for the task
-** timer_t		time		Number of ms in the future for the task to run
+** rtc_t		time		Number of ms in the future for the task to run
 ** uint8_t		priority	The priority of the task
 ** PTASKPARM	p			Pointer to the task parameters, can be NULL
 **
 ** Returns:		void 
 **
 ******************************************************************************/
-void scheduleTaskOnce(uint16_t taskID, timer_t time, PTASKPARM p)
+void scheduleTaskOnce(uint16_t taskID, rtc_t time, PTASKPARM p)
 {
 	PTASKDESC	td = NULL;
 

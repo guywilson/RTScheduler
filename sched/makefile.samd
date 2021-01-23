@@ -43,7 +43,7 @@ LIBTOOL=arm-none-eabi-ar
 VBUILD=vbuild
 
 # C compiler flags
-CFLAGS=-c -mcpu=$(DEVICE) -mthumb -Os -Wall -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -MMD -DF_CPU=48000000L -DARDUINO=10813 -DARDUINO_SAMD_MKRWAN1310 -DARDUINO_ARCH_SAMD -DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ -DUSE_BQ24195L_PMIC -DVERY_LOW_POWER
+CFLAGS=-c -mcpu=$(DEVICE) -mthumb -Os -Wall -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -DF_CPU=48000000L -DARDUINO=10813 -DARDUINO_SAMD_MKRWAN1310 -DARDUINO_ARCH_SAMD -DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ -DUSE_BQ24195L_PMIC -DVERY_LOW_POWER
 
 # Lib tool flags
 LIBFLAGS=rcs
@@ -77,8 +77,8 @@ version:
 	$(VBUILD) -incfile scheduler.ver -template template/version.c.template -out $(SRC)/version.c -major $(MAJOR_VERSION) -minor $(MINOR_VERSION)
 
 install:
-	cp $(LIBDIR)/$(TARGET) /usr/arm-none-eabi/lib
-	cp $(SRC)/*.h /usr/arm-none-eabi/include
+	cp $(LIBDIR)/$(TARGET) /usr/lib
+	cp $(SRC)/*.h /usr/include
 
 clean:
 	rm $(BUILD)/*

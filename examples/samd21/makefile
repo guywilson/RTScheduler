@@ -20,7 +20,8 @@ ARCHSIZE=32
 
 # What is our target
 ELF=$(PROJNAME).elf
-TARGET=$(PROJNAME).hex
+HEX=$(PROJNAME).hex
+TARGET=$(PROJNAME).bin
 
 # Build output directory
 BUILD=build
@@ -32,13 +33,12 @@ SRC=src
 SCHEDSRC=src/sched
 
 # Arduino base directory
-ARDUINOBASE=/home/guy/.arduino15/packages/arduino
+ARDUINOBASE=/Users/guy/Library/Arduino15/packages/arduino
 CMSISBASE=$(ARDUINOBASE)/tools/CMSIS
 SAMDBASE=$(ARDUINOBASE)/hardware/samd/1.8.11
 
 # Port we use to upload the target to the device
-UPLOADPORT=/dev/cu.wchusbserial1410
-#UPLOADPORT=/dev/cu.usbmodem1411
+UPLOADPORT=/dev/cu.usbmodem101
 
 # C compiler
 CC=arm-none-eabi-gcc
@@ -56,16 +56,19 @@ OBJDUMP=arm-none-eabi-objdump
 SIZETOOL=arm-none-eabi-size
 
 # Upload tool
-UPLOADTOOL=./upload.sh
+UPLOADTOOL=/Users/guy/Library/Arduino15/packages/arduino/tools/bossac/1.7.0-arduino3/bossac
+
+# Upload flags
+UPLOADFLAGS=-i -d -e -w -v -R -p
 
 # Include dir flags
-INCLUDEFLAGS=-I$(CMSISBASE)/4.5.0/CMSIS/Include/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/samd21/include/ -I$(SAMDBASE)/cores/arduino/api/deprecated -I$(SAMDBASE)/cores/arduino/api/deprecated-avr-comp -I$(SAMDBASE)/cores/arduino -I$(SAMDBASE)/variants/mkrwan1300
+INCLUDEFLAGS=-I../../sched/src -I$(CMSISBASE)/4.5.0/CMSIS/Include/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/samd21/include/ -I$(SAMDBASE)/cores/arduino/api/deprecated -I$(SAMDBASE)/cores/arduino/api/deprecated-avr-comp -I$(SAMDBASE)/cores/arduino -I$(SAMDBASE)/variants/mkrwan1300
 
 # C compiler flags
 CFLAGS=-c -mcpu=$(DEVICE) -mthumb -Os -Wall -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -DF_CPU=48000000L -DARDUINO=10813 -DARDUINO_SAMD_MKRWAN1310 -DARDUINO_ARCH_SAMD -DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ -DUSE_BQ24195L_PMIC -DVERY_LOW_POWER $(INCLUDEFLAGS)
 
 # Linker flags
-LFLAGS=-fuse-linker-plugin -Wl,--gc-sections -mcpu=$(DEVICE) -L/home/guy/.arduino15/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Lib/GCC/
+LFLAGS=-fuse-linker-plugin -Wl,--gc-sections -mcpu=$(DEVICE) -L/Users/guy/Library/Arduino15/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Lib/GCC/ -L../../sched/lib -L/Users/guy/development/arduino-core/samd21/lib
 
 # Hex file creator flags
 OBJCOPYFLAGS=-O ihex -R .eeprom
@@ -74,7 +77,7 @@ OBJCOPYFLAGS=-O ihex -R .eeprom
 OBJDUMPFLAGS=-I $(SRC) -f -s -l -S
 
 # Size tool flags
-SFLAGS=-C --mcu=$(DEVICE)
+SFLAGS=-A
 
 # Object files
 OBJFILES=$(BUILD)/led_utils.o $(BUILD)/heartbeat.o $(BUILD)/rtc_samd21.o $(BUILD)/error_samd21.o $(BUILD)/main.o
@@ -108,7 +111,7 @@ $(BUILD)/main.o: $(SRC)/main.c $(SRC)/heartbeat.h $(SRC)/taskdef.h $(SRC)/led_ut
 #
 ###############################################################################
 $(BUILD)/$(ELF): $(OBJFILES)
-	$(LINKER) $(LFLAGS) -o $(BUILD)/$(ELF) $(OBJFILES) -larm_cortexM0l_math -lm -lsched
+	$(LINKER) $(LFLAGS) -o $(BUILD)/$(ELF) $(OBJFILES) -lm -larm_cortexM0l_math -lcore-samd21 -lsched
 	$(OBJDUMP) $(OBJDUMPFLAGS) $(BUILD)/$(ELF) > $(PROJNAME).s
 
 ###############################################################################
@@ -117,7 +120,8 @@ $(BUILD)/$(ELF): $(OBJFILES)
 #
 ###############################################################################
 $(TARGET): $(BUILD)/$(ELF)
-	$(OBJCOPY) $(OBJCOPYFLAGS) $(BUILD)/$(ELF) $(TARGET)
+	$(OBJCOPY) $(OBJCOPYFLAGS) $(BUILD)/$(ELF) $(HEX)
+	$(OBJCOPY) -O binary $(BUILD)/$(ELF) $(TARGET)
 	$(SIZETOOL) $(SFLAGS) $(BUILD)/$(ELF)
 
 ###############################################################################
@@ -126,9 +130,12 @@ $(TARGET): $(BUILD)/$(ELF)
 #
 ###############################################################################
 install: $(TARGET)
-	$(UPLOADTOOL) $(DEVICE) $(TARGET) $(UPLOADPORT)
+	stty 1200 < $(UPLOADPORT)
+	sleep 1
+	$(UPLOADTOOL) $(UPLOADFLAGS) $(UPLOADPORT) $(TARGET)
 	
 clean: 
 	rm $(BUILD)/*
 	rm $(PROJNAME).s
+	rm $(HEX)
 	rm $(TARGET)
