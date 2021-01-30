@@ -26,6 +26,9 @@ BUILD=build
 # Source directory
 SRC=src
 
+# Scheduler source directory
+SCHEDSRC=src/sched
+
 # Arduino base directory
 ARDUINOBASE=/Users/guy/Library/Arduino15/packages/arduino
 CMSISBASE=$(ARDUINOBASE)/tools/CMSIS
@@ -56,16 +59,16 @@ UPLOADTOOL=/Users/guy/Library/Arduino15/packages/arduino/tools/bossac/1.7.0-ardu
 UPLOADFLAGS=-i -d -e -w -v -R -p
 
 # Include dir flags
-INCLUDEFLAGS=-Isrc -I$(CMSISBASE)/4.5.0/CMSIS/Include/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/samd21/include/ -I$(SAMDBASE)/cores/arduino/api/deprecated -I$(SAMDBASE)/cores/arduino/api/deprecated-avr-comp -I$(SAMDBASE)/cores/arduino -I$(SAMDBASE)/variants/mkrwan1300
+INCLUDEFLAGS=-I../../sched/src -I$(CMSISBASE)/4.5.0/CMSIS/Include/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/samd21/include/ -I$(SAMDBASE)/cores/arduino/api/deprecated -I$(SAMDBASE)/cores/arduino/api/deprecated-avr-comp -I$(SAMDBASE)/cores/arduino -I$(SAMDBASE)/variants/mkrwan1300
 
 # C compiler flags
 CFLAGS=-c -mcpu=$(DEVICE) -mthumb -Os -Wall -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -DF_CPU=48000000L -DARDUINO=10813 -DARDUINO_SAMD_MKRWAN1310 -DARDUINO_ARCH_SAMD -DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ -DUSE_BQ24195L_PMIC -DVERY_LOW_POWER $(INCLUDEFLAGS)
 
 # Library paths
-LIBDIRS=-L$(CMSISBASE)/4.5.0/CMSIS/Lib/GCC -L/Users/guy/development/arduino-core/samd21/lib
+LIBDIRS=-L$(CMSISBASE)/4.5.0/CMSIS/Lib/GCC -L/Users/guy/development/arduino-core/samd21/lib -L../../sched/lib
 
 # External Libraries
-EXTLIBS=-larm_cortexM0l_math -lcore
+EXTLIBS=-larm_cortexM0l_math -lcore -lsched
 
 # Linker flags
 LFLAGS=-Os -Wl,--gc-sections -T$(SAMDBASE)/variants/mkrwan1300/linker_scripts/gcc/flash_with_bootloader.ld --specs=nano.specs --specs=nosys.specs -mcpu=cortex-m0plus -mthumb $(LIBDIRS) -Wl,--check-sections -Wl,--gc-sections -Wl,--warn-common -Wl,--warn-section-align
@@ -80,7 +83,7 @@ OBJDUMPFLAGS=-I $(SRC) -f -s -l -S
 SFLAGS=-A
 
 # Object files
-OBJFILES=$(BUILD)/led_utils.o $(BUILD)/heartbeat.o $(BUILD)/rtc_samd21.o $(BUILD)/error_samd21.o $(BUILD)/scheduler.o $(BUILD)/version.o $(BUILD)/main.o
+OBJFILES=$(BUILD)/main.o
 
 # Target
 all: $(TARGET)
@@ -90,25 +93,7 @@ all: $(TARGET)
 # Project files
 #
 ###############################################################################
-$(BUILD)/led_utils.o: $(SRC)/led_utils.c $(SRC)/led_utils.h
-	$(CC) $(CFLAGS) -o $(BUILD)/led_utils.o $(SRC)/led_utils.c
-
-$(BUILD)/heartbeat.o: $(SRC)/heartbeat.c $(SRC)/heartbeat.h $(SRC)/led_utils.h $(SRC)/taskdef.h
-	$(CC) $(CFLAGS) -o $(BUILD)/heartbeat.o $(SRC)/heartbeat.c
-
-$(BUILD)/rtc_samd21.o: $(SRC)/rtc_samd21.c $(SRC)/rtc_samd21.h
-	$(CC) $(CFLAGS) -o $(BUILD)/rtc_samd21.o $(SRC)/rtc_samd21.c
-
-$(BUILD)/error_samd21.o: $(SRC)/error_samd21.c $(SRC)/led_utils.h
-	$(CC) $(CFLAGS) -o $(BUILD)/error_samd21.o $(SRC)/error_samd21.c
-
-$(BUILD)/scheduler.o: $(SRC)/scheduler.c $(SRC)/scheduler.h
-	$(CC) $(CFLAGS) -o $(BUILD)/scheduler.o $(SRC)/scheduler.c
-
-$(BUILD)/version.o: $(SRC)/version.c
-	$(CC) $(CFLAGS) -o $(BUILD)/version.o $(SRC)/version.c
-
-$(BUILD)/main.o: $(SRC)/main.c $(SRC)/scheduler.h $(SRC)/heartbeat.h $(SRC)/taskdef.h $(SRC)/led_utils.h $(SRC)/rtc_samd21.h
+$(BUILD)/main.o: $(SRC)/main.c
 	$(CC) $(CFLAGS) -o $(BUILD)/main.o $(SRC)/main.c
 
 ###############################################################################

@@ -13,14 +13,12 @@ void HeartbeatTask(PTASKPARM p)
 	static uint8_t on = 0;
 	
     if (on) {
-		/* set pin 5 low to turn led off */
-		turnOff(LED_BUILTIN);
+		turnOff();
         on = 0;
 		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(950), NULL);
     }
     else {
-		/* set pin 5 high to turn led on */
-		turnOn(LED_BUILTIN);
+		turnOn();
         on = 1;
 		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(50), NULL);
     }

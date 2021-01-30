@@ -1,4 +1,6 @@
 #include <stdint.h>
+
+#include <Arduino.h>
 #include <samd.h>
 #include <variant.h>
 
@@ -6,36 +8,29 @@
 
 void setupLEDPin(void)
 {
-	/*
-	** Set Port B - Pin 5 as output
-	** On the Arduino Nano, this is connected to the
-	** onboard LED...
-	*/
-    REG_PORT_DIRSET0 = (1 << LED_BUILTIN);
+	pinMode(LED_BUILTIN, OUTPUT);
 }
 
-void turnOn(uint32_t LED_ID)
+void turnOn()
 {
-	/* set pin 5 high to turn led on */
-	REG_PORT_OUTSET0 = (1 << LED_ID);
+	digitalWrite(LED_BUILTIN, HIGH);
 }
 
-void turnOff(uint32_t LED_ID)
+void turnOff()
 {
-	/* set pin 5 low to turn led off */
-	REG_PORT_OUTCLR0= (1 << LED_ID);
+	digitalWrite(LED_BUILTIN, LOW);
 }
 
-void toggleLED(uint32_t LED_ID)
+void toggleLED()
 {
 	static unsigned char state = 0;
 	
 	if (!state) {
-		turnOn(LED_ID);
+		turnOn();
 		state = 1;
 	}
 	else {
-		turnOff(LED_ID);
+		turnOff();
 		state = 0;
 	}
 }

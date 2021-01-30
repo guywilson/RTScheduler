@@ -25,19 +25,19 @@
 
 void dot()
 {
-	turnOn(LED_BUILTIN);
+	turnOn();
 	delay(150);
 
-	turnOff(LED_BUILTIN);
+	turnOff();
 	delay(150);
 }
 
 void dash()
 {
-	turnOn(LED_BUILTIN);
+	turnOn();
 	delay(750);
 
-	turnOff(LED_BUILTIN);
+	turnOff();
 	delay(150);
 }
 
@@ -60,10 +60,10 @@ void wordBreak()
 void _handleNoFreeTasks()
 {
 	while (1) {
-		turnOn(LED_BUILTIN);
+		turnOn();
         delay(ERR_ON_NOFREETASKS);
 
-		turnOff(LED_BUILTIN);
+		turnOff();
         delay(ERR_OFF_NOFREETASKS);
 	}
 }
@@ -77,10 +77,10 @@ void _handleNoFreeTasks()
 void _handleTaskCountOverFlow()
 {
 	while (1) {
-		turnOn(LED_BUILTIN);
+		turnOn();
         delay(ERR_ON_TASKCOUNTOVERFLOW);
 
-		turnOff(LED_BUILTIN);
+		turnOff();
         delay(ERR_OFF_TASKCOUNTOVERFLOW);
 	}
 }
@@ -94,10 +94,10 @@ void _handleTaskCountOverFlow()
 void _handleNullTask()
 {
 	while (1) {
-		turnOn(LED_BUILTIN);
+		turnOn();
         delay(ERR_ON_NULLTASK);
 
-		turnOff(LED_BUILTIN);
+		turnOff();
         delay(ERR_OFF_NULLTASK);
 	}
 }
@@ -111,10 +111,10 @@ void _handleNullTask()
 void _handleNullTaskExec()
 {
 	while (1) {
-		turnOn(LED_BUILTIN);
+		turnOn();
         delay(ERR_ON_NULLTASKEXEC);
 
-		turnOff(LED_BUILTIN);
+		turnOff();
         delay(ERR_OFF_NULLTASKEXEC);
 	}
 }
@@ -128,10 +128,10 @@ void _handleNullTaskExec()
 void _handleDropout()
 {
 	while (1) {
-		turnOn(LED_BUILTIN);
+		turnOn();
         delay(ERR_ON_DROPOUT);
 
-		turnOff(LED_BUILTIN);
+		turnOff();
         delay(ERR_OFF_DROPOUT);
 	}
 }
@@ -145,10 +145,10 @@ void _handleDropout()
 void _handleDefault()
 {
 	while (1) {
-		turnOn(LED_BUILTIN);
+		turnOn();
         delay(ERR_ON_DEFUALT);
 
-		turnOff(LED_BUILTIN);
+		turnOff();
         delay(ERR_OFF_DEFUALT);
 	}
 }

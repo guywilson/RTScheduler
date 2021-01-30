@@ -5,8 +5,8 @@
 #define _INCL_LEDUTILS
 
 void		setupLEDPin(void);
-void		turnOn(uint32_t LED_ID);
-void		turnOff(uint32_t LED_ID);
-void 		toggleLED(uint32_t LED_ID);
+void		turnOn();
+void		turnOff();
+void 		toggleLED();
 
 #endif

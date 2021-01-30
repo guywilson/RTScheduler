@@ -1,8 +1,8 @@
 #include <stddef.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
+#include <Arduino.h>
 #include <samd.h>
+#include <variant.h>
 
 #include <scheduler.h>
 #include <schederr.h>
@@ -13,44 +13,20 @@
 #include "heartbeat.h"
 #include "led_utils.h"
 
-#undef errno
-extern int errno;
-extern int _end;
-
-void main(void) __attribute__ ((noreturn));
-
-void _exit(int status)
-{
-	while (1);
-}
-
-caddr_t _sbrk(int incr)
-{
-	static unsigned char *heap = NULL;
-	unsigned char *prev_heap;
-
-	if (heap == NULL) {
-		heap = (unsigned char *)&_end;
-	}
-	prev_heap = heap;
-
-	heap += incr;
-
-	return (caddr_t) prev_heap;
-}
-
 void setup(void)
 {
+	init();
+	initVariant();
+
 	setupLEDPin();
 	setupRTC();
 }
 
-#pragma GCC diagnostic ignored  "-Wmain"
-void main(void)
+int main(void)
 {
 	setup();
 	
-	initScheduler(1);
+	initScheduler(16);
 
 	registerTask(TASK_HEARTBEAT, &HeartbeatTask);
 
@@ -63,4 +39,6 @@ void main(void)
 	** Start the scheduler...
 	*/
 	schedule();
+	
+	return -1;
 }
