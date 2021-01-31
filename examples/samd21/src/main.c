@@ -13,16 +13,13 @@
 #include "heartbeat.h"
 #include "led_utils.h"
 
-void setup(void)
-{
-	init();
-	initVariant();
-
-	setupLEDPin();
-}
-
 int main(void)
 {
+//	init();
+//	initVariant();
+
+	setupLEDPin();
+	
 	initScheduler(16);
 	
 	registerTask(TASK_HEARTBEAT, &HeartbeatTask);

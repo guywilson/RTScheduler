@@ -3,29 +3,12 @@
 #ifndef _INCL_SCHEDULER
 #define _INCL_SCHEDULER
 
-#define MAX_INT_SIZE			32
 #define CHECK_TIMER_OVERFLOW
-
-// #if defined ( __GNUC__ ) && defined ( __AVR__ )
-// #define MAX_INT_SIZE			32
-// #define CHECK_TIMER_OVERFLOW
-// #elif defined ( __GNUC__ ) && defined ( __ARM_EABI__)
-// #define MAX_INT_SIZE			64
-// #else
-// #define MAX_INT_SIZE			64
-// #endif
-
 #define DEFAULT_MAX_TASKS       16
 
 typedef void *					PTASKPARM;
 
-#if MAX_INT_SIZE == 64
-typedef uint64_t				rtc_t;
-#elif MAX_INT_SIZE == 32
 typedef uint32_t				rtc_t;
-#else
-typedef uint32_t				rtc_t;
-#endif
 
 #define MAX_TIMER_VALUE			~((rtc_t)0)
 

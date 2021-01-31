@@ -33,7 +33,4 @@
 #define RTC_ONE_MINUTE						rtc_val_ms(60000)
 #define RTC_ONE_HOUR						rtc_val_ms(3600000)
 
-
-void		setupRTC();
-
 #endif

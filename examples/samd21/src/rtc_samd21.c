@@ -12,6 +12,5 @@ extern void _rtcISR();
 int sysTickHook()
 {
 	_rtcISR();
-	
 	return 0;
 }
