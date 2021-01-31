@@ -21,6 +21,8 @@
 #include "scheduler.h"
 #include "schederr.h"
 
+#include "led_utils.h"
+
 #define TRACK_CPU_PCT
 
 #ifndef UNIT_TEST_MODE

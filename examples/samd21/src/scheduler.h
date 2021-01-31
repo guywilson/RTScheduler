@@ -4,10 +4,13 @@
 #define _INCL_SCHEDULER
 
 #define MAX_INT_SIZE			32
+#define CHECK_TIMER_OVERFLOW
 
 // #if defined ( __GNUC__ ) && defined ( __AVR__ )
 // #define MAX_INT_SIZE			32
 // #define CHECK_TIMER_OVERFLOW
+// #elif defined ( __GNUC__ ) && defined ( __ARM_EABI__)
+// #define MAX_INT_SIZE			64
 // #else
 // #define MAX_INT_SIZE			64
 // #endif

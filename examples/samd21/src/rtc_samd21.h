@@ -7,7 +7,7 @@
  * Set the RTC clock frequency to 1KHz (1ms tick). This is a
  * good frequency for the real-time scheduler...
  */
-#define RTC_CLOCK_FREQ					1000
+#define RTC_CLOCK_FREQ					48000
 
 /*
  ******************************************************************************

@@ -2,17 +2,9 @@ sched/lib/libsched.a
 sched/build/*
 examples/atmega328p/build/*
 examples/samd21/build/*
-examples/samd21_basic/build/*
 version_builder/vbuild
 version_builder/build/*
 .DS_Store
-examples/samd21/makefile.mak
 examples/samd21/rtssamd.bin
 examples/samd21/rtssamd.hex
-.gitignore
-examples/samd21_basic/rtssamd.s
-examples/samd21_basic/rtssamd.hex
-.gitignore
-examples/samd21_basic/Blink.ino.bin
-examples/samd21/build/rtssamd.elf
 examples/samd21/rtssamd.s

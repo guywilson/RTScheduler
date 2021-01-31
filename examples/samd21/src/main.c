@@ -19,15 +19,12 @@ void setup(void)
 	initVariant();
 
 	setupLEDPin();
-	setupRTC();
 }
 
 int main(void)
 {
-	setup();
-	
 	initScheduler(16);
-
+	
 	registerTask(TASK_HEARTBEAT, &HeartbeatTask);
 
 	scheduleTaskOnce(

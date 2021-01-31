@@ -9,11 +9,6 @@
 
 extern void _rtcISR();
 
-void setupRTC()
-{
-	SysTick_Config(1000);
-}
-
 int sysTickHook()
 {
 	_rtcISR();
