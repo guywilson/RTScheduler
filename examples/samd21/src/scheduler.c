@@ -122,24 +122,10 @@ void 						(* _tickTask)() = &_nullTickTask;
 ** Returns:		void 
 **
 ******************************************************************************/
-void _rtcISR()
+void inline _rtcISR()
 {
-#if RTC_INTERRUPT_PRESCALER != 1
-	_tickCount++;
-
-	if (_tickCount == RTC_INTERRUPT_PRESCALER) {
-	    /*
-	    ** The RTC is incremented every 1 ms,
-		** it is used to drive the real time clock
-		** for the scheduler...
-	    */
-		_realTimeClock++;
-
-		_tickCount = 0;
-	}
-#else
 	_realTimeClock++;
-#endif
+
 	/*
 	 * Run the tick task, defaults to the nullTick() function.
 	 *

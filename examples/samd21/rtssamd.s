@@ -24,8 +24,8 @@ Contents of section .text:
  2100 062000f0 a1fb10bd 10b50021 062000f0  . .........!. ..
  2110 9bfb10bd 70b50b4c 2578002d 09d0fff7  ....p..L%x.-....
  2120 f3ff0022 08492270 80204000 00f024f9  ...".I"p. @...$.
- 2130 70bdfff7 e3ff0123 96212a00 23700901  p......#.!*.#p..
- 2140 f2e7c046 9c000020 20b20000 10b500f0  ...F...  .......
+ 2130 70bdfff7 e3ff0123 f0212a00 23704900  p......#.!*.#pI.
+ 2140 f2e7c046 9c000020 a0b90000 10b500f0  ...F... ........
  2150 8df80020 10bd70b5 fa25fa24 ed006400  ... ..p..%.$..d.
  2160 fff7ccff 280000f0 4ffafff7 cdff2000  ....(...O..... .
  2170 00f04afa f4e710b5 fa24a400 fff7beff  ..J......$......
@@ -16190,14 +16190,14 @@ HeartbeatTask():
     2130:	bd70      	pop	{r4, r5, r6, pc}
     2132:	f7ff ffe3 	bl	20fc <turnOn>
     2136:	2301      	movs	r3, #1
-    2138:	2196      	movs	r1, #150	; 0x96
+    2138:	21f0      	movs	r1, #240	; 0xf0
     213a:	002a      	movs	r2, r5
     213c:	7023      	strb	r3, [r4, #0]
-    213e:	0109      	lsls	r1, r1, #4
+    213e:	0049      	lsls	r1, r1, #1
     2140:	e7f2      	b.n	2128 <HeartbeatTask+0x14>
     2142:	46c0      	nop			; (mov r8, r8)
     2144:	2000009c 	.word	0x2000009c
-    2148:	0000b220 	.word	0x0000b220
+    2148:	0000b9a0 	.word	0x0000b9a0
 
 0000214c <sysTickHook>:
 sysTickHook():
