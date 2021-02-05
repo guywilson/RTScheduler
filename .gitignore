@@ -1,10 +1,12 @@
-sched/lib/libsched.a
-sched/build/*
+sched/atmega328p/lib/libsched.a
+sched/atmega328p/build/*
+sched/samd21/lib/libsched.a
+sched/samd21/build/*
 examples/atmega328p/build/*
+examples/samd21/rtssamd.bin
+examples/samd21/rtssamd.hex
+examples/samd21/rtssamd.s
 examples/samd21/build/*
 version_builder/vbuild
 version_builder/build/*
 .DS_Store
-examples/samd21/rtssamd.bin
-examples/samd21/rtssamd.hex
-examples/samd21/rtssamd.s

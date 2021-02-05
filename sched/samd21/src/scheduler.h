@@ -3,12 +3,26 @@
 #ifndef _INCL_SCHEDULER
 #define _INCL_SCHEDULER
 
-#define CHECK_TIMER_OVERFLOW
+#define MAX_INT_SIZE			32
+
+// #if defined ( __GNUC__ ) && defined ( __AVR__ )
+// #define MAX_INT_SIZE			32
+// #define CHECK_TIMER_OVERFLOW
+// #else
+// #define MAX_INT_SIZE			64
+// #endif
+
 #define DEFAULT_MAX_TASKS       16
 
 typedef void *					PTASKPARM;
 
+#if MAX_INT_SIZE == 64
+typedef uint64_t				rtc_t;
+#elif MAX_INT_SIZE == 32
 typedef uint32_t				rtc_t;
+#else
+typedef uint32_t				rtc_t;
+#endif
 
 #define MAX_TIMER_VALUE			~((rtc_t)0)
 
@@ -60,6 +74,20 @@ typedef CPU_RATIO *	PCPU_RATIO;
 */
 #define RUN_NOW                 0
 
+/*
+ * If, for example, you want a faster interrupt frequency for the
+ * RTC tick task, set the prescaler here. If you want the interrupt
+ * frequency and clock frequency to be the same, simply set this to 1...
+ */
+#define RTC_INTERRUPT_PRESCALER			1
+
+/******************************************************************************
+**
+** The real-time clock interrupt service routing
+**
+******************************************************************************/
+void        _rtcISR();
+
 /******************************************************************************
 **
 ** Get the last recorded busy/idle CPU counts
@@ -88,6 +116,8 @@ const char * getSchedulerBuildDate();
 **
 ******************************************************************************/
 void 		initScheduler(int size);
+
+void        registerTickTask(void (* tickTask)());
 
 void		registerTask(uint16_t taskID, void (* run)(PTASKPARM));
 void		deregisterTask(uint16_t taskID);

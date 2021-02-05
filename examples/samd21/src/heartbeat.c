@@ -15,11 +15,11 @@ void HeartbeatTask(PTASKPARM p)
     if (on) {
 		turnOff();
         on = 0;
-		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(990), NULL);
+		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(950), NULL);
     }
     else {
 		turnOn();
         on = 1;
-		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(10), NULL);
+		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(50), NULL);
     }
 }

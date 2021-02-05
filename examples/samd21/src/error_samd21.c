@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <samd.h>
 #include <variant.h>
 

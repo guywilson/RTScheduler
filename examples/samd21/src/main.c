@@ -15,8 +15,8 @@
 
 int main(void)
 {
-//	init();
-//	initVariant();
+ 	init();
+// 	initVariant();
 
 	setupLEDPin();
 	

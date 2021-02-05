@@ -34,22 +34,12 @@ SAMDBASE=$(ARDUINOBASE)/hardware/samd/1.8.11
 # Port we use to upload the target to the device
 UPLOADPORT=/dev/cu.usbmodem101
 
-# C compiler
+# Tools
 CC=arm-none-eabi-gcc
-
-# Linker
-LINKER=arm-none-eabi-gcc
-
-# Hex file creator
+LINKER=arm-none-eabi-g++
 OBJCOPY=arm-none-eabi-objcopy
-
-# Assembly dump tool
 OBJDUMP=arm-none-eabi-objdump
-
-# Size tool
 SIZETOOL=arm-none-eabi-size
-
-# Upload tool
 UPLOADTOOL=/Users/guy/Library/Arduino15/packages/arduino/tools/bossac/1.7.0-arduino3/bossac
 
 # Upload flags
@@ -59,16 +49,16 @@ UPLOADFLAGS=-i -d -e -w -v -R -p
 INCLUDEFLAGS=-Isrc -I$(CMSISBASE)/4.5.0/CMSIS/Include/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/ -I$(ARDUINOBASE)/tools/CMSIS-Atmel/1.2.0/CMSIS/Device/ATMEL/samd21/include/ -I$(SAMDBASE)/cores/arduino/api/deprecated -I$(SAMDBASE)/cores/arduino/api/deprecated-avr-comp -I$(SAMDBASE)/cores/arduino -I$(SAMDBASE)/variants/mkrwan1300
 
 # C compiler flags
-CFLAGS=-c -mcpu=$(DEVICE) -mthumb -Os -Wall -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -DF_CPU=48000000L -DARDUINO=10813 -DARDUINO_SAMD_MKRWAN1310 -DARDUINO_ARCH_SAMD -DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ -DUSE_BQ24195L_PMIC -DVERY_LOW_POWER $(INCLUDEFLAGS)
+CFLAGS=-c -mcpu=$(DEVICE) -mthumb -Wall -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -DF_CPU=48000000L -DARDUINO=10813 -DARDUINO_SAMD_MKRWAN1310 -DARDUINO_ARCH_SAMD -DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ -DUSE_BQ24195L_PMIC -DVERY_LOW_POWER $(INCLUDEFLAGS)
 
 # Library paths
 LIBDIRS=-L$(CMSISBASE)/4.5.0/CMSIS/Lib/GCC -L/Users/guy/development/arduino-core/samd21/lib
 
 # External Libraries
-EXTLIBS=-larm_cortexM0l_math -lcore
+EXTLIBS=-larm_cortexM0l_math -lcore-samd21
 
 # Linker flags
-LFLAGS=-Os -Wl,--gc-sections -T$(SAMDBASE)/variants/mkrwan1300/linker_scripts/gcc/flash_with_bootloader.ld --specs=nano.specs --specs=nosys.specs -mcpu=cortex-m0plus -mthumb $(LIBDIRS) -Wl,--check-sections -Wl,--gc-sections -Wl,--warn-common -Wl,--warn-section-align
+LFLAGS=-Wl,--gc-sections -T$(SAMDBASE)/variants/mkrwan1300/linker_scripts/gcc/flash_with_bootloader.ld --specs=nano.specs --specs=nosys.specs -mcpu=cortex-m0plus -mthumb $(LIBDIRS) -Wl,--check-sections -Wl,--gc-sections -Wl,--warn-common -Wl,--warn-section-align
 
 # Hex file creator flags
 OBJCOPYFLAGS=-O ihex -R .eeprom
@@ -80,7 +70,7 @@ OBJDUMPFLAGS=-I $(SRC) -f -s -l -S
 SFLAGS=-A
 
 # Object files
-OBJFILES=$(BUILD)/led_utils.o $(BUILD)/heartbeat.o $(BUILD)/rtc_samd21.o $(BUILD)/error_samd21.o $(BUILD)/scheduler.o $(BUILD)/version.o $(BUILD)/main.o
+OBJFILES=$(BUILD)/led_utils.o $(BUILD)/heartbeat.o $(BUILD)/error_samd21.o $(BUILD)/scheduler.o $(BUILD)/version.o $(BUILD)/main.o
 
 # Target
 all: $(TARGET)
@@ -95,9 +85,6 @@ $(BUILD)/led_utils.o: $(SRC)/led_utils.c $(SRC)/led_utils.h
 
 $(BUILD)/heartbeat.o: $(SRC)/heartbeat.c $(SRC)/heartbeat.h $(SRC)/led_utils.h $(SRC)/taskdef.h
 	$(CC) $(CFLAGS) -o $(BUILD)/heartbeat.o $(SRC)/heartbeat.c
-
-$(BUILD)/rtc_samd21.o: $(SRC)/rtc_samd21.c $(SRC)/rtc_samd21.h
-	$(CC) $(CFLAGS) -o $(BUILD)/rtc_samd21.o $(SRC)/rtc_samd21.c
 
 $(BUILD)/error_samd21.o: $(SRC)/error_samd21.c $(SRC)/led_utils.h
 	$(CC) $(CFLAGS) -o $(BUILD)/error_samd21.o $(SRC)/error_samd21.c

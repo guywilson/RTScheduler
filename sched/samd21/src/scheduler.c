@@ -18,12 +18,8 @@
 #include <unistd.h>
 #endif
 
-#include <Arduino.h>
-
 #include "scheduler.h"
 #include "schederr.h"
-
-#include "led_utils.h"
 
 #define TRACK_CPU_PCT
 
@@ -68,6 +64,22 @@ void _nullTask(PTASKPARM p)
 	handleError(ERROR_SCHED_NULLTASKEXEC);
 }
 
+/******************************************************************************
+**
+** Name: _nullTickTask()
+**
+** Description: Null tick task.
+**
+** Parameters:	N/A
+**
+** Returns:		void 
+**
+******************************************************************************/
+void _nullTickTask()
+{
+	// Do nothing...
+}
+
 PTASKDESC					taskDescs;				// Array of tasks for the scheduler, allocated in initScheduler()
 int							taskArrayLength;		// Length of the task array, e.g. num tasks allocated
 
@@ -78,10 +90,16 @@ PTASKDESC					tail = NULL;			// Pointer to the end of the registered task queue
 
 uint32_t					_tasksRunCount = 0;		// The total number of tasks run by the scheduler
 
+volatile rtc_t 				_realTimeClock = 0;		// The real time clock counter
+volatile uint16_t			_tickCount = 0;			// Num ticks between rtc counts
+
 volatile uint32_t			_busyCount = 0;
 volatile uint32_t			_idleCount = 0;
 
-#define getRTCClockCount()	(millis())
+// The RTC tick task...
+void 						(* _tickTask)() = &_nullTickTask;
+
+#define getRTCClockCount()	(_realTimeClock)
 
 #ifdef TRACK_CPU_PCT
 #define signalBusy()		_busyCount++
@@ -90,6 +108,44 @@ volatile uint32_t			_idleCount = 0;
 #define signalBusy()		// Do nothing
 #define signalIdle()		// Do nothing
 #endif
+
+/******************************************************************************
+**
+** Name: _rtcISR()
+**
+** Description: The RTC interrupt handler.
+**
+** Parameters:	N/A
+**
+** Returns:		void 
+**
+******************************************************************************/
+void _rtcISR()
+{
+#if RTC_INTERRUPT_PRESCALER != 1
+	_tickCount++;
+
+	if (_tickCount == RTC_INTERRUPT_PRESCALER) {
+	    /*
+	    ** The RTC is incremented every 1 ms,
+		** it is used to drive the real time clock
+		** for the scheduler...
+	    */
+		_realTimeClock++;
+
+		_tickCount = 0;
+	}
+#else
+	_realTimeClock++;
+#endif
+	/*
+	 * Run the tick task, defaults to the nullTick() function.
+	 *
+	 * This must be a very fast operation, as it is outside of
+	 * the scheduler's control. Also, there can be only 1 tick task...
+	 */
+	_tickTask();
+}
 
 /******************************************************************************
 **
@@ -283,6 +339,23 @@ printf("Allocated %d tasks\n", taskArrayLength);
 		td->next			= NULL;
 		td->prev			= NULL;
 	}
+}
+
+/******************************************************************************
+**
+** Name: registerTickTask()
+**
+** Description: Registers the scheduler tick task. This tick task is called 
+**				from the RTC ISR.
+**
+** Parameters:	void 	(* tickTask)	Pointer to the tick task function
+**
+** Returns:		void 
+**
+******************************************************************************/
+void registerTickTask(void (* tickTask)())
+{
+	_tickTask = tickTask;
 }
 
 /******************************************************************************

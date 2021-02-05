@@ -1,0 +1,12 @@
+#define __BDATE__      "<BUILD_DATE>"
+#define __BVERSION__   "<BUILD_VERSION>"
+
+const char * getSchedulerVersion()
+{
+    return __BVERSION__;
+}
+
+const char * getSchedulerBuildDate()
+{
+    return __BDATE__;
+}
