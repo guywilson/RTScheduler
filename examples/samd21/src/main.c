@@ -13,34 +13,34 @@
 #include "heartbeat.h"
 #include "led_utils.h"
 
-/*
-** System Core Clock is at 1MHz (8MHz/8) at Reset.
-** It is switched to 48MHz in the Reset Handler (startup.c)
-*/
-uint32_t SystemCoreClock = 1000000ul;
-
 void initialiseSAMD21()
 {
 	/*
 	** Set SysTick to 100us...
 	*/
-	if (SysTick_Config(SystemCoreClock / 10000)) {
+	if (SysTick_Config(100ul)) {
 		while (1) ;
 	}
 
 	NVIC_SetPriority (SysTick_IRQn,  (1 << __NVIC_PRIO_BITS) - 2);  /* set Priority for Systick Interrupt (2nd lowest) */
 
-	// Clock PORT for Digital I/O
-	//  PM->APBBMASK.reg |= PM_APBBMASK_PORT ;
-	//
-	//  // Clock EIC for I/O interrupts
-	//  PM->APBAMASK.reg |= PM_APBAMASK_EIC ;
-
 	// Clock SERCOM for Serial
-	PM->APBCMASK.reg |= PM_APBCMASK_SERCOM0 | PM_APBCMASK_SERCOM1 | PM_APBCMASK_SERCOM2 | PM_APBCMASK_SERCOM3 | PM_APBCMASK_SERCOM4 | PM_APBCMASK_SERCOM5 ;
+	PM->APBCMASK.reg |= 
+			(PM_APBCMASK_SERCOM0 | 
+			PM_APBCMASK_SERCOM1 | 
+			PM_APBCMASK_SERCOM2 | 
+			PM_APBCMASK_SERCOM3 | 
+			PM_APBCMASK_SERCOM4 | 
+			PM_APBCMASK_SERCOM5);
 
 	// Clock TC/TCC for Pulse and Analog
-	PM->APBCMASK.reg |= PM_APBCMASK_TCC0 | PM_APBCMASK_TCC1 | PM_APBCMASK_TCC2 | PM_APBCMASK_TC3 | PM_APBCMASK_TC4 | PM_APBCMASK_TC5 ;
+	PM->APBCMASK.reg |= 
+			(PM_APBCMASK_TCC0 | 
+			PM_APBCMASK_TCC1 | 
+			PM_APBCMASK_TCC2 | 
+			PM_APBCMASK_TC3 | 
+			PM_APBCMASK_TC4 | 
+			PM_APBCMASK_TC5);
 
 	// Clock ADC/DAC for Analog
 	PM->APBCMASK.reg |= PM_APBCMASK_ADC | PM_APBCMASK_DAC ;
