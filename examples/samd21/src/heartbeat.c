@@ -10,16 +10,16 @@
 
 void HeartbeatTask(PTASKPARM p)
 {
-	static uint8_t on = 0;
-	
+    static uint8_t on = 0;
+
     if (on) {
-		turnOff();
+        turnOff();
         on = 0;
-		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(950), NULL);
+        scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(950), NULL);
     }
     else {
-		turnOn();
+        turnOn();
         on = 1;
-		scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(50), NULL);
+        scheduleTaskOnce(TASK_HEARTBEAT, rtc_val_ms(50), NULL);
     }
 }

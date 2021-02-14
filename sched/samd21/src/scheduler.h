@@ -3,7 +3,7 @@
 #ifndef _INCL_SCHEDULER
 #define _INCL_SCHEDULER
 
-#define MAX_INT_SIZE			32
+#define MAX_INT_SIZE			64
 
 // #if defined ( __GNUC__ ) && defined ( __AVR__ )
 // #define MAX_INT_SIZE			32

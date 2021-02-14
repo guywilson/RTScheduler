@@ -4,6 +4,9 @@
 
 int sysTickHook()
 {
+    /*
+    ** Call the scheduler ISR...
+    */
     _rtcISR();
 
     return 0;
