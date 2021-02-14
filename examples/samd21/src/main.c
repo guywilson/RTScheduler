@@ -13,10 +13,13 @@
 #include "heartbeat.h"
 #include "led_utils.h"
 
+extern void __libc_init_array(void);
+
 int main(void)
 {
  	init();
-// 	initVariant();
+    __libc_init_array();
+     initVariant();
 
 	setupLEDPin();
 	
